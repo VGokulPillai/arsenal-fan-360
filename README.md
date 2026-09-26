@@ -7,6 +7,7 @@ Arsenal Fan 360 is an end‑to‑end Databricks prototype that unifies raw suppo
 (NBA) with rules + a **GenAI‑written reason**, serves it operationally from **Lakebase**, lets marketers explore it
 in a **Genie** space, and surfaces everything in a polished **Databricks App**.
 
+- **GitHub repo:** https://github.com/VGokulPillai/arsenal-fan-360
 - **Live app:** https://arsenal-fan-360-7474651167448568.aws.databricksapps.com
 - **Workspace:** https://fevm-serverless-stable-1acr1x.cloud.databricks.com/?o=7474651167448568
 - **Catalog:** `serverless_stable_1acr1x_catalog` → schemas `af360_bronze`, `af360_silver`, `af360_gold`
