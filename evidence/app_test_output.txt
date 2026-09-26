@@ -1,184 +1,73 @@
-ARSENAL FAN 360 — DEPLOYED APP TEST EVIDENCE
-Generated: 2026-09-26T23:32:26Z
+ARSENAL FAN 360 — DEPLOYED APP TEST EVIDENCE (LIVE Lakebase + LIVE Genie)
+Generated: 2026-09-26T23:53:44Z
 App URL: https://arsenal-fan-360-7474651167448568.aws.databricksapps.com
-Deployment: deployment_id 01f1ba0253b41ab8beb473f5d889729e, state SUCCEEDED ('App started successfully')
+App service principal: a3448142-a85d-4efb-924a-0b7f8358c189
+Lakebase resource attached: instance=arsenal-lakebase db=databricks_postgres schema=fan360
+Genie grant: app SP has CAN_RUN on space 01f1b9fe891814be841d05a418e8b32d + SELECT on af360_gold + CAN_USE warehouse
 
-== GET /api/health ==
-{"status":"ok","app":"arsenal-fan-360","data_source":"Gold snapshot (Delta Customer 360)","lakebase":false,"supporters_loaded":5000}
+== GET /api/health  (note data_source + lakebase:true) ==
+{"status":"ok","app":"arsenal-fan-360","data_source":"Databricks Lakebase (operational)","lakebase":true,"supporters_loaded":5000}
 
-== GET /api/overview ==
+== POST /api/activation  (LIVE write to Lakebase fan360.activation_history) ==
 {
-    "kpis": {
-        "total_supporters": 5000,
-        "high_intent": 333,
-        "revenue": 1175207,
-        "matches_attended": 3919,
-        "open_opportunities": 2748
-    },
-    "intent_distribution": [
-        {
-            "band": "0-39 Low",
-            "count": 3341
-        },
-        {
-            "band": "40-69 Medium",
-            "count": 1326
-        },
-        {
-            "band": "70-100 High",
-            "count": 333
-        }
-    ],
-    "actions": [
-        {
-            "action": "Stadium Tour",
-            "count": 2252
-        },
-        {
-            "action": "Arsenal Shirt / Merchandise",
-            "count": 919
-        },
-        {
-            "action": "Membership Upgrade",
-            "count": 803
-        },
-        {
-            "action": "Hospitality",
-            "count": 522
-        },
-        {
-            "action": "Re-engagement Campaign",
-            "count": 311
-        },
-        {
-            "action": "Match Ticket",
-            "count": 193
-        }
-    ],
-    "revenue_by_segment": [
-        {
-            "segment": "Members",
-            "value": 501764.9900000006
-        },
-        {
-            "segment": "Non-members",
-            "value": 673441.9799999985
-        }
-    ],
-    "engagement_trend": [
-        {
-            "label": "-8w",
-            "score": 1
-        },
-        {
-            "label": "-7w",
-            "score": 2
-        },
-        {
-            "label": "-6w",
-            "score": 7
-        },
-        {
-            "label": "-5w",
-            "score": 6
-        },
-        {
-            "label": "-4w",
-            "score": 7
-        },
-        {
-            "label": "-3w",
-            "score": 10
-        },
-        {
-            "label": "-2w",
-            "score": 13
-        },
-        {
-            "label": "-1w",
-            "score": 16
-        }
-    ],
-    "data_source": "Gold snapshot (Delta Customer 360)"
+    "activation_id": "act-92420e2b44",
+    "supporter_id": "S004917",
+    "recommended_action": "Match Ticket",
+    "selected_action": "Hospitality",
+    "campaign": "Emirates Hospitality Q4",
+    "created_at": "2026-09-26T23:53:46.111518",
+    "status": "queued",
+    "store": "Databricks Lakebase"
 }
 
-== GET /api/opportunities ==
+== GET /api/activations  (read back from Lakebase; incl. row written earlier by the sync notebook) ==
 [
     {
-        "type": "Experience",
-        "count": 2252,
-        "description": "Engaged supporters to nurture with an experience offer.",
-        "action": "Stadium Tour"
+        "activation_id": "act-92420e2b44",
+        "supporter_id": "S004917",
+        "recommended_action": "Match Ticket",
+        "selected_action": "Hospitality",
+        "campaign": "Emirates Hospitality Q4",
+        "created_at": "2026-09-26 23:53:46.643162",
+        "status": "queued"
     },
     {
-        "type": "Merchandise Opportunity",
-        "count": 919,
-        "description": "High product browsing or abandoned baskets.",
-        "action": "Merchandise Reminder"
+        "activation_id": "act-9a5849cf2a",
+        "supporter_id": "S004917",
+        "recommended_action": "Match Ticket",
+        "selected_action": "Match Ticket",
+        "campaign": "Live Lakebase E2E",
+        "created_at": "2026-09-26 23:50:33.053786",
+        "status": "queued"
     },
     {
-        "type": "Membership Opportunity",
-        "count": 803,
-        "description": "Frequent match attendees who are not currently members.",
-        "action": "Membership Upgrade"
-    },
-    {
-        "type": "Hospitality Opportunity",
-        "count": 522,
-        "description": "High spend and attendance \u2014 premium experience candidates.",
-        "action": "Hospitality Invite"
-    },
-    {
-        "type": "Re-engagement",
-        "count": 311,
-        "description": "No meaningful interaction during the last 60 days.",
-        "action": "Re-engagement Campaign"
-    },
-    {
-        "type": "Ticket Intent",
-        "count": 193,
-        "description": "Viewed tickets multiple times but have not purchased.",
-        "action": "Match Ticket Offer"
+        "activation_id": "act-75734a7fcd",
+        "supporter_id": "S004917",
+        "recommended_action": "Match Ticket",
+        "selected_action": "Match Ticket",
+        "campaign": "Autumn Membership Drive",
+        "created_at": "2026-09-26 23:08:49.362149",
+        "status": "queued"
     }
 ]
 
-== GET /api/supporter/S004917 (detail) ==
-name: Emile 
+== GET /api/supporter/S004917  (profile from live Lakebase join) ==
+name: Emile
 intent: 82
 nba: Match Ticket
-reason: Emile's high intent score and recent ticket browsing activity signal strong match attendance interest, making a targeted ticket offer the ideal next step to convert him.
-activity_rows: 10
+reason: Emile's high intent score and recent ticket browsing activity signal strong match attendance interest, making a targeted ticket offer the ideal next step to con
 
-== POST /api/activation (write-back to activation_history) ==
-{
-    "activation_id": "act-4efbe4f590",
-    "supporter_id": "S004917",
-    "recommended_action": "Match Ticket",
-    "selected_action": "Match Ticket",
-    "campaign": "Autumn Fixtures 2025",
-    "created_at": "2026-09-26T23:32:29.458021",
-    "status": "queued",
-    "store": "in-memory (Lakebase unavailable)"
-}
+== POST /api/genie/ask  (LIVE Databricks Genie Space) ==
+source: Databricks Genie Space
+answer: The **top 5 supporters by purchase intent** are:
+- **Emile** (**S004917**) — **82** — **Match Ticket**
+- **Martin** (**S003160**) — **80** — **Arsenal Shirt / Merchandise**
+- **Gabriel** (**S000246**) — **78** — **Arsenal Shirt / Merchandise**
+- **Diego** (**S000643**) — **78** — **Arsenal Shirt / Merchandise**
+- **Kenji** (**S001915**) — **78** — **Membership Upgrade**
 
-== GET /api/activations (recent, after write) ==
-[
-  {
-    "activation_id": "act-4efbe4f590",
-    "supporter_id": "S004917",
-    "recommended_action": "Match Ticket",
-    "selected_action": "Match Ticket",
-    "campaign": "Autumn Fixtures 2025",
-    "created_at": "2026-09-26T23:32:29.458021",
-    "status": "queued",
-    "store": "in-memory (Lakebase unavailable)"
-  }
-]
+All 5 supporters shown are **high intent** (scores of **78–82**), with **merchandise** being the most common recommended next step.
 
-== POST /api/genie/ask ==
-answer: The **top 10 supporters by purchase intent** range from 82 down to 77/100. Most are candidates for their recommended next best action.
-rows: 10
-source: Arsenal Fan 360 analytics (Genie fallback)
-
-== GET / (SPA served) ==
-<title>Arsenal Fan 360 — Next Best Action</title>
+== POST /api/genie/ask  (second live question) ==
+source: Databricks Genie Space
+answer: Revenue was **501,764.99** from **members** and **673,441.98** from **non-members**. **Non-members generated more revenue**, by about **171,676.99** based on the two groups shown.

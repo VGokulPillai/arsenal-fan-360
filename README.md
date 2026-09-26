@@ -141,10 +141,18 @@ Four sections, reusing the Arsenal visual identity (crest, Emirates imagery, red
    Re‑engagement) each drilling into the ranked supporters.
 4. **Ask Arsenal** — natural‑language Q&A backed by the Genie space (with an analytics fallback resolver).
 
-**Data access is dual‑mode:** when a Lakebase database resource is attached the app reads/writes live Postgres;
-otherwise it serves the governed Gold snapshot and logs activations in memory. The deployed instance currently
-serves the **Gold snapshot** (`/api/health` → `data_source: "Gold snapshot (Delta Customer 360)"`, 5,000
-supporters); the Lakebase write‑back path is proven live in [`evidence/lakebase_results.txt`](evidence/lakebase_results.txt).
+**The deployed app runs 100% live:**
+
+- **Live Lakebase** — a `database` resource (instance `arsenal-lakebase`, db `databricks_postgres`) is attached to
+  the app; the app service principal reads `fan360.supporter_profile`/`next_best_action` and writes
+  `fan360.activation_history` over Postgres. `/api/health` reports
+  `data_source: "Databricks Lakebase (operational)", lakebase: true`. "Add to Campaign" persists to Postgres
+  (verified — the read‑back includes the row written earlier by the sync notebook).
+- **Live Genie** — the app SP has `CAN_RUN` on the Genie space (+ `SELECT` on `af360_gold` + `CAN_USE` on the
+  warehouse), so "Ask Arsenal" calls the real space (`source: "Databricks Genie Space"`).
+
+Data access is **dual‑mode**: if Lakebase/Genie are ever unreachable the app degrades gracefully to the governed
+Gold snapshot and a local resolver, so it always runs. See [`evidence/app_test_output.txt`](evidence/app_test_output.txt).
 
 ---
 

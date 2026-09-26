@@ -3,7 +3,7 @@
 Uses Databricks SDK OAuth token rotation for auth. Gracefully degrades to an
 in-memory activation log when Lakebase is not reachable, so the app always runs.
 """
-import logging, uuid, datetime
+import logging, os, uuid, datetime
 from . import config
 
 logger = logging.getLogger(__name__)
@@ -37,13 +37,24 @@ def _password() -> str:
 
 
 def _connect():
-    if not HAS_PG or not config.PG_HOST:
+    if not HAS_PG:
         return None
+    # Databricks Apps inject PGHOST/PGUSER/PGDATABASE/PGSSLMODE when a `database`
+    # resource is attached; the password is a short-lived OAuth token we mint via
+    # the SDK. A `postgresql://` URI in DB_CONNECTION_STRING is used only if valid.
+    dsn = os.environ.get("DB_CONNECTION_STRING", "") or os.environ.get("LAKEBASE_URL", "")
+    if dsn and not dsn.startswith("postgres"):
+        dsn = ""  # injected value is a bare host, not a usable libpq DSN
     try:
-        conn = psycopg2.connect(
-            host=config.PG_HOST, port=config.PG_PORT, dbname=config.PG_DATABASE,
-            user=config.PG_USER or None, password=_password() or None,
-            sslmode="require", connect_timeout=8)
+        if dsn:
+            conn = psycopg2.connect(dsn, connect_timeout=8)
+        elif config.PG_HOST:
+            conn = psycopg2.connect(
+                host=config.PG_HOST, port=config.PG_PORT, dbname=config.PG_DATABASE,
+                user=config.PG_USER or None, password=_password() or None,
+                sslmode=os.environ.get("PGSSLMODE", "require"), connect_timeout=8)
+        else:
+            return None
         cur = conn.cursor()
         cur.execute(f"SET search_path TO {config.PG_SCHEMA}, public;")
         cur.close()
