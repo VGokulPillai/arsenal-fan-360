@@ -1,0 +1,30 @@
+command:
+  - "python"
+  - "-m"
+  - "uvicorn"
+  - "app:app"
+  - "--host"
+  - "0.0.0.0"
+  - "--port"
+  - "8000"
+
+env:
+  - name: CATALOG
+    value: "serverless_stable_1acr1x_catalog"
+  - name: GOLD_SCHEMA
+    value: "af360_gold"
+  - name: DATABRICKS_WAREHOUSE_ID
+    value: "4484f27c707c5a31"
+  - name: SERVING_ENDPOINT
+    value: "databricks-claude-sonnet-4-6"
+  - name: LAKEBASE_INSTANCE
+    value: "arsenal-lakebase"
+  - name: PG_SCHEMA
+    value: "fan360"
+  # GENIE_SPACE_ID is set after the Genie space is created (see /genie)
+  - name: GENIE_SPACE_ID
+    value: "01f1b9fe891814be841d05a418e8b32d"
+  # When a Lakebase database resource is attached to the app, Databricks injects
+  # PGHOST/PGDATABASE/PGUSER/PGPORT and the app reads/writes the operational
+  # tables live. Until then the app serves the governed Gold snapshot and logs
+  # activations in-memory (Lakebase write-back is proven in evidence/lakebase_results.txt).

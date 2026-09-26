@@ -1,0 +1,63 @@
+==========================================================================
+ARSENAL FAN 360 :: GENIE SPACE 'Arsenal Supporter Intelligence'
+space_id: 01f1b9fe891814be841d05a418e8b32d
+==========================================================================
+
+Q: What are the top 10 supporters by purchase intent?
+A: You want to see the top 10 supporters ranked by their purchase intent score, including their first name, recommended next action, and the reason for that recommendation.
+   supporter_id | first_name | purchase_intent_score | recommended_next_action | recommendation_reason | purchase_intent_rank
+   S004917 | Emile | 82 | Match Ticket | Emile's high intent score and recent ticket browsing activity signal strong match attendance interest, making a targeted ticket offer the ideal next step to convert him. | 1
+   S003160 | Martin | 80 | Arsenal Shirt / Merchandise | Martin's high intent score, repeated product views, and three abandoned baskets signal strong purchase readiness—a targeted merchandise nudge could convert his existing interest into a sale. | 2
+   S000246 | Gabriel | 78 | Arsenal Shirt / Merchandise | Gabriel has viewed products 4 times and abandoned 2 baskets recently, signalling strong purchase intent that a targeted shirt or merchandise offer could convert. | 3
+   S000643 | Diego | 78 | Arsenal Shirt / Merchandise | Diego's high intent score, repeated product views, and two abandoned baskets signal strong purchase readiness—a targeted merchandise offer could convert his existing interest into a sale. | 4
+   S001915 | Kenji | 78 | Membership Upgrade | Kenji's high intent score, recent membership page views, and abandoned basket suggest he's close to purchasing, making a timely upgrade prompt likely to convert. | 5
+   S001964 | Beth | 78 | Arsenal Shirt / Merchandise | Beth has shown clear purchase intent through recent product views and an abandoned basket, making a targeted merchandise nudge likely to convert her into a sale. | 6
+   S003864 | Sofia | 78 | Arsenal Shirt / Merchandise | Sofia has viewed merchandise 3 times and abandoned 2 baskets recently, signalling strong purchase intent that a targeted shirt offer could convert into her first product purchase. | 7
+   S004379 | Katie | 78 | Arsenal Shirt / Merchandise | Katie's repeated product views and two abandoned baskets signal strong purchase intent, making a targeted merchandise nudge the ideal prompt to convert her interest into a sale. | 8
+   S004800 | Diego | 78 | Hospitality | Diego's high intent score and product browsing suggest growing interest, and a Hospitality offer could convert his engagement into his first matchday attendance and significantly increase lifetime value. | 9
+   S000537 | Riley | 77 | Match Ticket | Riley has shown strong purchase intent through recent ticket browsing and an abandoned basket, making a targeted match ticket offer the ideal nudge to convert their first attendance. | 10
+   SQL: WITH ranked_supporters AS ( SELECT `supporter_id`, `first_name`, `purchase_intent_score`, `recommended_next_action`, `recommendation_reason`, RANK() OVER ( ORDER BY `purchase_intent_score` DESC, `supporter_id` ASC ) AS `purchase_intent_rank` FROM `serverless_stable_1acr1x_catalog`.`af360_gold`.`gold
+A: Examples include:
+- **#1 Emile** (supporter **S004917**) with a purchase intent score of **82** — recommended next action: **Match Ticket**
+- **#2 Martin** (supporter **S003160**) with a score of **80** — recommended next action: **Arsenal Shirt / Merchandise**
+- **#3 Gabriel** (supporter **S000246**) with a score of **78** — recommended next action: **Arsenal Shirt / Merchandise**
+- **#4 Diego** (supporter **S000643**) with a score of **78** — recommended next action: **Arsenal Shirt / Merchandise**
+- **#5 Kenji** (supporter **S001915**) with a score of **78** — recommended next action: **Membership Upgrade**
+
+Across all 10 top-ranked supporters shown, scores range from **77 to 82**, and **7 of the 10** have a recommended next action tied to merchandise or tickets.
+
+Q: Which non-members attended the most matches?
+A: You want to find the non-member supporters who have attended the highest number of matches.
+   supporter_id | first_name | membership_tier | matches_attended
+   S004309 | Drew | None | 6
+   SQL: WITH ranked_supporters AS ( SELECT `supporter_id`, `first_name`, `membership_tier`, `matches_attended`, RANK() OVER ( ORDER BY `matches_attended` DESC, `supporter_id` ASC ) AS `match_rank` FROM `serverless_stable_1acr1x_catalog`.`af360_gold`.`gold_supporter_360` WHERE `membership_tier` IN ('None', '
+A: The non-member who attended the most matches is **supporter ID S004309** (**Drew**), with **membership tier None** and **6 matches attended**. In the returned result set of **1 top-ranked row**, **6 matches** is the highest attendance among supporters with membership tier **None** or **Free**.
+
+Q: How much revenue came from members versus non-members?
+A: You want to see the total revenue generated by supporters, broken down into members and non-members based on their membership tier.
+   membership_status | total_revenue
+   Member | 501764.99
+   Non-member | 673441.9800000002
+   SQL: SELECT CASE WHEN `membership_tier` IN ('None', 'Free') THEN 'Non-member' ELSE 'Member' END AS `membership_status`, SUM(`total_customer_value`) AS `total_revenue` FROM `serverless_stable_1acr1x_catalog`.`af360_gold`.`gold_supporter_360` WHERE `membership_tier` IS NOT NULL AND `total_customer_value` I
+A: Based on the available data, **members** generated **501,764.99** in revenue, while **non-members** generated **673,441.98**. In this result, **non-members brought in more revenue than members**.
+
+Q: Which supporters should receive a membership campaign?
+A: You want to see a list of supporters who are not currently paying members (those with membership tiers 'None' or 'Free') and who are recommended to receive a membership campaign. The list includes their ID, first name, membership tier, purchase intent score, engagement score, recommended next action, and the reason for the recommendation. The supporters are ordered by highest purchase intent score first, then by engagement score, and finally by supporter ID.
+   supporter_id | first_name | membership_tier | purchase_intent_score | engagement_score | recommended_next_action | recommendation_reason
+   S001915 | Kenji | None | 78 | 30 | Membership Upgrade | Kenji's high intent score, recent membership page views, and abandoned basket suggest he's close to purchasing, making a timely upgrade prompt likely to convert.
+   S004378 | Ingrid | Free | 76 | 32 | Membership Upgrade | Ingrid's high lifetime value (£851) and strong intent score (76/100), combined with recent product browsing and an abandoned basket, signal readiness to convert to a paid membership.
+   S004284 | Skyler | None | 76 | 29 | Membership Upgrade | Skyler's high intent score (76/100), abandoned basket, and membership page view signal strong upgrade readiness, making a targeted membership offer likely to convert.
+   S001045 | Vivianne | None | 76 | 23 | Membership Upgrade | Vivianne's high intent score and repeated membership page views signal strong upgrade readiness, making a targeted membership offer likely to convert her significant lifetime value into committed membership.
+   S002396 | Beth | None | 76 | 21 | Membership Upgrade | Beth's abandoned basket and membership page view signal purchase intent, making a targeted upgrade prompt likely to convert her into a paying member.
+   S003473 | Kai | None | 75 | 28 | Membership Upgrade | Kai's high intent score, £551 lifetime value, and recent abandoned basket suggest strong purchase readiness, making a targeted membership upgrade offer likely to convert.
+   S003271 | Chidi | None | 74 | 34 | Membership Upgrade | Chidi's strong lifetime value of £372, solid intent score of 74, and recent membership page view suggest genuine interest in deeper club commitment worth converting now.
+   S001160 | Sofia | Free | 74 | 31 | Membership Upgrade | Sofia's abandoned basket and product browsing signal purchase intent, and upgrading her membership could convert that interest into higher lifetime value and deeper club engagement.
+   S004961 | Declan | Free | 74 | 28 | Membership Upgrade | Declan's strong intent score and £175 lifetime value signal genuine loyalty, making a membership upgrade a natural next step to deepen his engagement.
+   S004416 | Taylor | None | 74 | 26 | Membership Upgrade | Taylor has viewed the membership page twice recently and shows strong intent (74/100), suggesting readiness to formalise their growing connection with the club through an upgraded membership.
+   SQL: SELECT `supporter_id`, `first_name`, `membership_tier`, `purchase_intent_score`, `engagement_score`, `recommended_next_action`, `recommendation_reason` FROM `serverless_stable_1acr1x_catalog`.`af360_gold`.`gold_supporter_360` WHERE `membership_tier` IN ('None', 'Free') AND `supporter_id` IS NOT NULL
+A: Examples of supporters who should receive a membership campaign include:
+- **Kenji** (**S001915**) — **None** tier, purchase intent **78**, engagement **30**, recommended action: **Membership Upgrade**.
+- **Ingrid** (**S004378**) — **Free** tier, purchase intent **76**, engagement **32**, recommended action: **Membership Upgrade**.
+- **Skyler** (**S004284**) — **None** tier, purchase intent **76**, engagement **29**, recommended action: **Membership Upgrade**.
+- **Vivianne** (**S001045**) — **None** tier, purchase intent **76**, engagement **23**, recommended action: **Membership Upgrade**.
+- **Beth** (**S002396**) — **None** tier, purchase intent **76**, engagement **21**, recommended action: **Membership Upgrade**.

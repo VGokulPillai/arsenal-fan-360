@@ -1,0 +1,184 @@
+ARSENAL FAN 360 — DEPLOYED APP TEST EVIDENCE
+Generated: 2026-09-26T23:32:26Z
+App URL: https://arsenal-fan-360-7474651167448568.aws.databricksapps.com
+Deployment: deployment_id 01f1ba0253b41ab8beb473f5d889729e, state SUCCEEDED ('App started successfully')
+
+== GET /api/health ==
+{"status":"ok","app":"arsenal-fan-360","data_source":"Gold snapshot (Delta Customer 360)","lakebase":false,"supporters_loaded":5000}
+
+== GET /api/overview ==
+{
+    "kpis": {
+        "total_supporters": 5000,
+        "high_intent": 333,
+        "revenue": 1175207,
+        "matches_attended": 3919,
+        "open_opportunities": 2748
+    },
+    "intent_distribution": [
+        {
+            "band": "0-39 Low",
+            "count": 3341
+        },
+        {
+            "band": "40-69 Medium",
+            "count": 1326
+        },
+        {
+            "band": "70-100 High",
+            "count": 333
+        }
+    ],
+    "actions": [
+        {
+            "action": "Stadium Tour",
+            "count": 2252
+        },
+        {
+            "action": "Arsenal Shirt / Merchandise",
+            "count": 919
+        },
+        {
+            "action": "Membership Upgrade",
+            "count": 803
+        },
+        {
+            "action": "Hospitality",
+            "count": 522
+        },
+        {
+            "action": "Re-engagement Campaign",
+            "count": 311
+        },
+        {
+            "action": "Match Ticket",
+            "count": 193
+        }
+    ],
+    "revenue_by_segment": [
+        {
+            "segment": "Members",
+            "value": 501764.9900000006
+        },
+        {
+            "segment": "Non-members",
+            "value": 673441.9799999985
+        }
+    ],
+    "engagement_trend": [
+        {
+            "label": "-8w",
+            "score": 1
+        },
+        {
+            "label": "-7w",
+            "score": 2
+        },
+        {
+            "label": "-6w",
+            "score": 7
+        },
+        {
+            "label": "-5w",
+            "score": 6
+        },
+        {
+            "label": "-4w",
+            "score": 7
+        },
+        {
+            "label": "-3w",
+            "score": 10
+        },
+        {
+            "label": "-2w",
+            "score": 13
+        },
+        {
+            "label": "-1w",
+            "score": 16
+        }
+    ],
+    "data_source": "Gold snapshot (Delta Customer 360)"
+}
+
+== GET /api/opportunities ==
+[
+    {
+        "type": "Experience",
+        "count": 2252,
+        "description": "Engaged supporters to nurture with an experience offer.",
+        "action": "Stadium Tour"
+    },
+    {
+        "type": "Merchandise Opportunity",
+        "count": 919,
+        "description": "High product browsing or abandoned baskets.",
+        "action": "Merchandise Reminder"
+    },
+    {
+        "type": "Membership Opportunity",
+        "count": 803,
+        "description": "Frequent match attendees who are not currently members.",
+        "action": "Membership Upgrade"
+    },
+    {
+        "type": "Hospitality Opportunity",
+        "count": 522,
+        "description": "High spend and attendance \u2014 premium experience candidates.",
+        "action": "Hospitality Invite"
+    },
+    {
+        "type": "Re-engagement",
+        "count": 311,
+        "description": "No meaningful interaction during the last 60 days.",
+        "action": "Re-engagement Campaign"
+    },
+    {
+        "type": "Ticket Intent",
+        "count": 193,
+        "description": "Viewed tickets multiple times but have not purchased.",
+        "action": "Match Ticket Offer"
+    }
+]
+
+== GET /api/supporter/S004917 (detail) ==
+name: Emile 
+intent: 82
+nba: Match Ticket
+reason: Emile's high intent score and recent ticket browsing activity signal strong match attendance interest, making a targeted ticket offer the ideal next step to convert him.
+activity_rows: 10
+
+== POST /api/activation (write-back to activation_history) ==
+{
+    "activation_id": "act-4efbe4f590",
+    "supporter_id": "S004917",
+    "recommended_action": "Match Ticket",
+    "selected_action": "Match Ticket",
+    "campaign": "Autumn Fixtures 2025",
+    "created_at": "2026-09-26T23:32:29.458021",
+    "status": "queued",
+    "store": "in-memory (Lakebase unavailable)"
+}
+
+== GET /api/activations (recent, after write) ==
+[
+  {
+    "activation_id": "act-4efbe4f590",
+    "supporter_id": "S004917",
+    "recommended_action": "Match Ticket",
+    "selected_action": "Match Ticket",
+    "campaign": "Autumn Fixtures 2025",
+    "created_at": "2026-09-26T23:32:29.458021",
+    "status": "queued",
+    "store": "in-memory (Lakebase unavailable)"
+  }
+]
+
+== POST /api/genie/ask ==
+answer: The **top 10 supporters by purchase intent** range from 82 down to 77/100. Most are candidates for their recommended next best action.
+rows: 10
+source: Arsenal Fan 360 analytics (Genie fallback)
+
+== GET / (SPA served) ==
+<title>Arsenal Fan 360 — Next Best Action</title>

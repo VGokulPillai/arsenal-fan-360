@@ -1,0 +1,54 @@
+==========================================================================
+ARSENAL FAN 360 :: LAKEFLOW PIPELINE EXECUTION
+Run time (UTC): 2026-09-26T22:41:00.432807
+Warehouse     : 4484f27c707c5a31
+Catalog       : serverless_stable_1acr1x_catalog
+==========================================================================
+
+----- BRONZE : bronze_pipeline.sql  (10 statements) -----
+  [OK] CREATE OR REPLACE TABLE serverless_stable_1acr1x_catalog.af360_bronze.
+  [OK] COMMENT ON TABLE serverless_stable_1acr1x_catalog.af360_bronze.bronze_
+  [OK] CREATE OR REPLACE TABLE serverless_stable_1acr1x_catalog.af360_bronze.
+  [OK] COMMENT ON TABLE serverless_stable_1acr1x_catalog.af360_bronze.bronze_
+  [OK] CREATE OR REPLACE TABLE serverless_stable_1acr1x_catalog.af360_bronze.
+  [OK] COMMENT ON TABLE serverless_stable_1acr1x_catalog.af360_bronze.bronze_
+  [OK] CREATE OR REPLACE TABLE serverless_stable_1acr1x_catalog.af360_bronze.
+  [OK] COMMENT ON TABLE serverless_stable_1acr1x_catalog.af360_bronze.bronze_
+  [OK] CREATE OR REPLACE TABLE serverless_stable_1acr1x_catalog.af360_bronze.
+  [OK] COMMENT ON TABLE serverless_stable_1acr1x_catalog.af360_bronze.bronze_
+
+----- SILVER : silver_pipeline.sql  (10 statements) -----
+  [OK] CREATE OR REPLACE TABLE serverless_stable_1acr1x_catalog.af360_silver.
+  [OK] COMMENT ON TABLE serverless_stable_1acr1x_catalog.af360_silver.silver_
+  [OK] CREATE OR REPLACE TABLE serverless_stable_1acr1x_catalog.af360_silver.
+  [OK] COMMENT ON TABLE serverless_stable_1acr1x_catalog.af360_silver.silver_
+  [OK] CREATE OR REPLACE TABLE serverless_stable_1acr1x_catalog.af360_silver.
+  [OK] COMMENT ON TABLE serverless_stable_1acr1x_catalog.af360_silver.silver_
+  [OK] CREATE OR REPLACE TABLE serverless_stable_1acr1x_catalog.af360_silver.
+  [OK] COMMENT ON TABLE serverless_stable_1acr1x_catalog.af360_silver.silver_
+  [OK] CREATE OR REPLACE TABLE serverless_stable_1acr1x_catalog.af360_silver.
+  [OK] COMMENT ON TABLE serverless_stable_1acr1x_catalog.af360_silver.silver_
+
+----- GOLD : gold_pipeline.sql  (4 statements) -----
+  [OK] CREATE OR REPLACE TABLE serverless_stable_1acr1x_catalog.af360_gold.go
+  [OK] COMMENT ON TABLE serverless_stable_1acr1x_catalog.af360_gold.gold_supp
+  [OK] CREATE OR REPLACE TABLE serverless_stable_1acr1x_catalog.af360_gold.go
+  [OK] COMMENT ON TABLE serverless_stable_1acr1x_catalog.af360_gold.gold_supp
+
+==========================================================================
+ROW COUNTS BY LAYER
+==========================================================================
+  bronze  bronze_supporters                 5,000 rows
+  bronze  bronze_web_events                20,000 rows
+  bronze  bronze_ecommerce_orders           8,030 rows
+  bronze  bronze_ticket_orders              5,000 rows
+  bronze  bronze_marketing_events          10,000 rows
+  silver  silver_supporters                 5,000 rows
+  silver  silver_web_events                20,000 rows
+  silver  silver_ecommerce_orders           8,000 rows
+  silver  silver_ticket_orders              5,000 rows
+  silver  silver_marketing_events          10,000 rows
+  gold    gold_supporter_360                5,000 rows
+  gold    gold_supporter_activity          43,000 rows
+
+  De-duplication check (ecommerce): bronze=8,030 -> silver=8,000 (30 duplicate orders removed)

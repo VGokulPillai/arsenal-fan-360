@@ -1,0 +1,107 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .font-arsenal-bebas {
+    font-family: "Bebas Neue", Impact, "Arial Narrow", sans-serif !important;
+    font-synthesis: none;
+  }
+}
+
+@layer utilities {
+  .text-transfer-market-value {
+    color: var(--arsenal-navy) !important;
+  }
+}
+
+:root {
+  --arsenal-red: #EF0107;
+  --arsenal-navy: #063672;
+  --arsenal-gold: #9C824A;
+  --arsenal-black: #1B1B1B;
+}
+
+body {
+  @apply bg-black text-white antialiased;
+  font-family: "Inter", system-ui, sans-serif;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-white/20 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-white/30;
+}
+
+.glass-card {
+  @apply bg-white/[0.08] backdrop-blur-xl rounded-2xl border border-white/[0.12] shadow-glass;
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.glass-card:hover {
+  @apply bg-white/[0.12] border-white/[0.18] shadow-glass-lg;
+  transform: translateY(-2px);
+}
+
+.glass-card-light {
+  @apply bg-white/[0.12] backdrop-blur-xl rounded-xl border border-white/[0.15] shadow-glass-sm;
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.glass-card-light:hover {
+  @apply bg-white/[0.18] border-white/[0.22] shadow-glass;
+  transform: translateY(-1px);
+}
+
+@keyframes pulse-live {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+.animate-pulse-live {
+  animation: pulse-live 2s ease-in-out infinite;
+}
+
+@keyframes slide-in-right {
+  from { transform: translateX(20px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+.animate-slide-in {
+  animation: slide-in-right 0.4s ease-out forwards;
+}
+
+@keyframes node-pulse {
+  0%, 100% { r: inherit; opacity: 0.4; }
+  50%      { r: calc(1px + inherit); opacity: 0; }
+}
+@keyframes edge-flow {
+  0%   { stroke-dashoffset: 100; }
+  100% { stroke-dashoffset: 0; }
+}
+@keyframes fade-slide-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes glow-pulse {
+  0%, 100% { opacity: 0.4; }
+  50%       { opacity: 1; }
+}
+@keyframes conf-bar-grow {
+  from { width: 0; }
+}
+
+.node-running  { animation: node-pulse 1.4s ease-in-out infinite; }
+.edge-active   { animation: edge-flow 1.2s linear infinite; }
+.card-enter    { animation: fade-slide-up 0.35s ease-out forwards; }
+.glow-pulse    { animation: glow-pulse 2s ease-in-out infinite; }
+.conf-bar      { animation: conf-bar-grow 0.7s ease-out; }

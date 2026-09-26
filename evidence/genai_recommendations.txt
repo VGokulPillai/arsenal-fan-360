@@ -1,0 +1,79 @@
+==========================================================================
+ARSENAL FAN 360 :: GenAI NEXT-BEST-ACTION EXPLANATIONS
+Foundation Model endpoint: databricks-claude-sonnet-4-6
+==========================================================================
+
+[Match Ticket] Emile (None) - intent 82/100
+  Why: Emile's high intent score and recent ticket browsing activity signal strong match attendance interest, making a targeted ticket offer the ideal next step to convert him.
+
+[Arsenal Shirt / Merchandise] Martin (Red Member) - intent 80/100
+  Why: Martin's high intent score, repeated product views, and three abandoned baskets signal strong purchase readiness—a targeted merchandise nudge could convert his existing interest into a sale.
+
+[Arsenal Shirt / Merchandise] Beth (Free) - intent 78/100
+  Why: Beth has shown clear purchase intent through recent product views and an abandoned basket, making a targeted merchandise nudge likely to convert her into a sale.
+
+[Arsenal Shirt / Merchandise] Gabriel (Free) - intent 78/100
+  Why: Gabriel has viewed products 4 times and abandoned 2 baskets recently, signalling strong purchase intent that a targeted shirt or merchandise offer could convert.
+
+[Hospitality] Diego (Silver) - intent 78/100
+  Why: Diego's high intent score and product browsing suggest growing interest, and a Hospitality offer could convert his engagement into his first matchday attendance and significantly increase lifetime value.
+
+[Arsenal Shirt / Merchandise] Katie (Gold) - intent 78/100
+  Why: Katie's repeated product views and two abandoned baskets signal strong purchase intent, making a targeted merchandise nudge the ideal prompt to convert her interest into a sale.
+
+[Arsenal Shirt / Merchandise] Diego (Gold) - intent 78/100
+  Why: Diego's high intent score, repeated product views, and two abandoned baskets signal strong purchase readiness—a targeted merchandise offer could convert his existing interest into a sale.
+
+[Arsenal Shirt / Merchandise] Sofia (Gold) - intent 78/100
+  Why: Sofia has viewed merchandise 3 times and abandoned 2 baskets recently, signalling strong purchase intent that a targeted shirt offer could convert into her first product purchase.
+
+[Membership Upgrade] Kenji (None) - intent 78/100
+  Why: Kenji's high intent score, recent membership page views, and abandoned basket suggest he's close to purchasing, making a timely upgrade prompt likely to convert.
+
+[Stadium Tour] Yuki (Gold) - intent 77/100
+  Why: Yuki's high intent score and moderate digital engagement suggest growing curiosity about Arsenal, and a Stadium Tour offers an immersive experience to deepen emotional connection beyond their single match attendance.
+
+[Match Ticket] Sofia (Silver) - intent 77/100
+  Why: Sofia's high intent score and repeated ticket browsing with no purchases suggest she's ready to attend her first match and just needs a direct ticket offer to convert.
+
+[Arsenal Shirt / Merchandise] Jamie (Red Member) - intent 77/100
+  Why: Jamie has shown clear purchase intent through product browsing and an abandoned basket, making a targeted merchandise nudge the ideal prompt to convert their first-ever Arsenal purchase.
+
+[Arsenal Shirt / Merchandise] Priya (Silver) - intent 77/100
+  Why: Priya's abandoned basket, recent product views, and strong intent score of 77 signal she's close to purchasing merchandise—a targeted nudge could convert her interest into a sale.
+
+[Arsenal Shirt / Merchandise] Skyler (None) - intent 77/100
+  Why: Skyler has viewed products 4 times and abandoned a basket, signalling strong purchase intent that a targeted merchandise offer could convert into their first transaction.
+
+[Arsenal Shirt / Merchandise] Morgan (Red Member) - intent 77/100
+  Why: Morgan has shown clear purchase intent through recent product views and an abandoned basket, making a targeted merchandise nudge likely to convert.
+
+[Match Ticket] Vivianne (Gold) - intent 77/100
+  Why: Vivianne's high intent score and repeated ticket browsing signal strong purchase readiness, making a targeted match ticket offer the ideal nudge to convert her first attendance.
+
+[Arsenal Shirt / Merchandise] Rowan (Silver) - intent 77/100
+  Why: Rowan has viewed products 5 times and abandoned 2 baskets recently, signalling strong purchase intent that a targeted merchandise nudge could convert into a sale.
+
+[Match Ticket] Martin (Silver) - intent 77/100
+  Why: Martin has shown strong purchase intent through recent ticket browsing and an abandoned basket, making a targeted match ticket offer the ideal nudge to convert his first attendance.
+
+[Arsenal Shirt / Merchandise] Yuki (Silver) - intent 77/100
+  Why: Yuki's abandoned basket, recent product views, and high intent score (77/100) signal strong purchase readiness—a targeted merchandise offer could convert this near-buyer now.
+
+[Match Ticket] Drew (None) - intent 77/100
+  Why: Drew's high intent score and repeated ticket browsing with no purchases suggest strong match-day interest that a targeted ticket offer could convert into a first attendance.
+
+[Match Ticket] Riley (None) - intent 77/100
+  Why: Riley has shown strong purchase intent through recent ticket browsing and an abandoned basket, making a targeted match ticket offer the ideal nudge to convert their first attendance.
+
+[Arsenal Shirt / Merchandise] Martin (Free) - intent 76/100
+  Why: Martin has shown strong purchase intent by viewing products and abandoning two baskets, making a targeted merchandise prompt the ideal nudge to convert his existing interest into a sale.
+
+[Membership Upgrade] Beth (None) - intent 76/100
+  Why: Beth's abandoned basket and membership page view signal purchase intent, making a targeted upgrade prompt likely to convert her into a paying member.
+
+[Arsenal Shirt / Merchandise] Reese (Silver) - intent 76/100
+  Why: Reese has viewed products 3 times and abandoned a basket, signalling strong purchase intent—a targeted merchandise offer could convert this near-buyer into a sale.
+
+[Arsenal Shirt / Merchandise] Wei (None) - intent 76/100
+  Why: Wei has shown clear purchase intent through recent ticket and product browsing plus an abandoned basket, making a targeted merchandise nudge likely to convert their existing interest into a first purchase.

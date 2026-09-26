@@ -1,0 +1,38 @@
+==========================================================================
+ARSENAL FAN 360 :: LAKEBASE OPERATIONAL SERVING
+Instance: arsenal-lakebase  host: ep-gentle-credit-d83j1tqb.database.us-east-2.cloud.databricks.com  db: databricks_postgres  schema: fan360
+==========================================================================
+supporter_profile rows : 5,000
+next_best_action rows  : 5,000
+activation_history rows: 1
+
+-- Sample supporter_profile (top intent) --
+  S004917 | Emile | None | 0 | 61.24 | 82
+  S003160 | Martin | Red Member | 0 | 302.56 | 80
+  S001964 | Beth | Free | 0 | 126.55 | 78
+  S003864 | Sofia | Gold | 0 | 130.48 | 78
+  S000246 | Gabriel | Free | 1 | 128.96 | 78
+  S001915 | Kenji | None | 1 | 58.08 | 78
+  S004379 | Katie | Gold | 2 | 628.56 | 78
+  S004800 | Diego | Silver | 0 | 139.07 | 78
+
+-- Sample next_best_action --
+  S004917 | Match Ticket | Ticket Intent | 82
+  S003160 | Arsenal Shirt / Merchandise | Merchandise Opportunity | 80
+  S001964 | Arsenal Shirt / Merchandise | Merchandise Opportunity | 78
+  S003864 | Arsenal Shirt / Merchandise | Merchandise Opportunity | 78
+  S000246 | Arsenal Shirt / Merchandise | Merchandise Opportunity | 78
+  S001915 | Membership Upgrade | Membership Opportunity | 78
+  S004379 | Arsenal Shirt / Merchandise | Merchandise Opportunity | 78
+  S004800 | Hospitality | Hospitality Opportunity | 78
+
+-- Opportunity type distribution --
+  Experience                   2252
+  Merchandise Opportunity       919
+  Membership Opportunity        803
+  Hospitality Opportunity       522
+  Re-engagement                 311
+  Ticket Intent                 193
+
+-- activation_history (write-back from app) --
+  act-75734a7fcd | S004917 | Match Ticket | Match Ticket | Autumn Membership Drive | 2026-09-26 23:08:49.362149 | queued

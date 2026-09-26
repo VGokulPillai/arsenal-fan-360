@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+
+# Node / frontend build tooling
+node_modules/
+app/frontend/node_modules/
+.vite/
+
+# Local deploy staging (regenerated at deploy time)
+app/.deploy/
+
+# Raw vite output (canonical served build is committed at app/frontend_dist/)
+app/frontend/dist/
+
+# OS
+.DS_Store
+
+# Databricks CLI
+.databricks/

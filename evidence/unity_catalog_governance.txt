@@ -1,0 +1,50 @@
+
+==========================================================================
+UNITY CATALOG :: GOVERNED TABLES (af360 schemas)
+==========================================================================
+table_schema | table_name              | comment                                   
+-------------+-------------------------+-------------------------------------------
+af360_bronze | bronze_ecommerce_orders | BRONZE: raw online store / merchandise ord
+af360_bronze | bronze_marketing_events | BRONZE: raw email / marketing campaign int
+af360_bronze | bronze_supporters       | BRONZE: raw supporter/membership records a
+af360_bronze | bronze_ticket_orders    | BRONZE: raw matchday ticket transactions a
+af360_bronze | bronze_web_events       | BRONZE: raw digital clickstream events (ar
+af360_gold   | gold_supporter_360      | GOLD: Customer 360 - one row per supporter
+af360_gold   | gold_supporter_activity | GOLD: normalised cross-channel supporter a
+af360_silver | silver_ecommerce_orders | SILVER: conformed merchandise orders. De-d
+af360_silver | silver_marketing_events | SILVER: conformed marketing / campaign int
+af360_silver | silver_supporters       | SILVER: conformed supporter dimension. Sta
+af360_silver | silver_ticket_orders    | SILVER: conformed matchday ticket transact
+af360_silver | silver_web_events       | SILVER: conformed clickstream events. Cast
+
+==========================================================================
+UNITY CATALOG :: COLUMN COMMENTS on gold_supporter_360
+==========================================================================
+column_name             | comment                                   
+------------------------+-------------------------------------------
+supporter_id            | Synthetic surrogate supporter key (no real
+membership_tier         | Current membership tier: None/Free/Silver/
+total_customer_value    | Lifetime ticket + merchandise spend (GBP).
+engagement_score        | Breadth/recency engagement index 0-100.   
+purchase_intent_score   | Likelihood (0-100) of purchase/engagement 
+recommended_next_action | Next Best Action label served to marketing
+recommendation_reason   | Natural-language justification (GenAI gene
+
+==========================================================================
+UNITY CATALOG :: TABLE & COLUMN TAGS (classification / governance)
+==========================================================================
+
+-- table tags
+tag_name     | tag_value
+-------------+----------
+domain       | sales    
+data_product | analytics
+
+-- column tags
+column_name           | tag_name       | tag_value   
+----------------------+----------------+-------------
+city                  | classification | confidential
+city                  | pii_type       | address     
+first_name            | classification | confidential
+first_name            | pii_type       | name        
+purchase_intent_score | classification | internal    

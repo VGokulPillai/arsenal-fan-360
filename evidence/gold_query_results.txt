@@ -1,0 +1,51 @@
+
+==========================================================================
+GOLD :: SELECT sample from gold_supporter_360
+==========================================================================
+supporter_id | first_name | country        | membership_tier | matches_attended | total_customer_value | ticket_views_30d | cart_abandons_30d | engagement_score | purchase_intent_score | recommended_next_action    
+-------------+------------+----------------+-----------------+------------------+----------------------+------------------+-------------------+------------------+-----------------------+----------------------------
+S003582      | Sofia      | Germany        | Gold            | 1                | 198.49               | 2                | 0                 | 41               | 43                    | Hospitality                
+S000481      | Mateo      | United Kingdom | Silver          | 5                | 419.22               | 1                | 3                 | 51               | 42                    | Hospitality                
+S004867      | Skyler     | United States  | Silver          | 0                | 595.21               | 0                | 2                 | 33               | 40                    | Arsenal Shirt / Merchandise
+S004917      | Emile      | United States  | None            | 0                | 61.24                | 3                | 0                 | 31               | 39                    | Match Ticket               
+S003077      | Noor       | United Kingdom | None            | 3                | 391.97               | 0                | 2                 | 48               | 39                    | Membership Upgrade         
+S000273      | Harper     | India          | Free            | 0                | 177.98               | 3                | 2                 | 25               | 38                    | Match Ticket               
+S001406      | Hassan     | Nigeria        | Red Member      | 1                | 216.09               | 0                | 3                 | 24               | 35                    | Arsenal Shirt / Merchandise
+S002944      | Riley      | Japan          | Red Member      | 1                | 448.07               | 1                | 2                 | 31               | 35                    | Arsenal Shirt / Merchandise
+S000375      | Riley      | India          | None            | 1                | 168.02               | 0                | 3                 | 27               | 35                    | Arsenal Shirt / Merchandise
+S000246      | Gabriel    | United Kingdom | Free            | 1                | 128.96               | 1                | 2                 | 31               | 35                    | Arsenal Shirt / Merchandise
+
+==========================================================================
+GOLD :: Recommended Next Best Action distribution
+==========================================================================
+recommended_next_action     | supporters | avg_intent
+----------------------------+------------+-----------
+Stadium Tour                | 2747       | 2.2       
+Arsenal Shirt / Merchandise | 903        | 9.9       
+Membership Upgrade          | 495        | 6.1       
+Hospitality                 | 446        | 6.7       
+Re-engagement Campaign      | 353        | 0.0       
+Match Ticket                | 56         | 13.2      
+
+==========================================================================
+GOLD :: Intent score bands
+==========================================================================
+intent_band  | supporters
+-------------+-----------
+40-69 Medium | 3         
+0-39 Low     | 4997      
+
+==========================================================================
+GOLD :: Revenue members vs non-members
+==========================================================================
+segment    | supporters | total_value
+-----------+------------+------------
+Non-member | 2948       | 673442.0   
+Member     | 2052       | 501765.0   
+
+==========================================================================
+GOLD :: Opportunity cohorts
+==========================================================================
+ticket_intent | membership_opp | merch_opp | reengagement
+--------------+----------------+-----------+-------------
+56            | 157            | 936       | 370         
