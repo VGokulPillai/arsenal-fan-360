@@ -10,12 +10,13 @@ from . import config, store
 logger = logging.getLogger(__name__)
 
 SUGGESTIONS = [
-    "Who are our highest intent supporters?",
-    "Show fans likely to buy tickets.",
-    "Which non-members have attended the most matches?",
-    "Which supporters abandoned a merchandise basket?",
-    "Where are our biggest commercial opportunities?",
-    "How much revenue came from members versus non-members?",
+    # executive / commercial questions (CCO + Head of Fan Engagement)
+    "How much supporter value sits in high-intent supporters?",
+    "How much commercial value is associated with non-members?",
+    "How many frequent attendees are not currently members?",
+    "How much supporter value is currently flagged for hospitality?",
+    "How many lapsing supporters should we re-engage?",
+    "What are the biggest commercial opportunities by supporter value?",
 ]
 
 

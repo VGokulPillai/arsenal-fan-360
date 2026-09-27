@@ -45,7 +45,9 @@ CREATE TABLE IF NOT EXISTS fan360.next_best_action (
     updated_at             TIMESTAMP DEFAULT now()
 );
 
--- Write-back log: activations triggered from the application ("Add to Campaign")
+-- Write-back log: activations triggered from the application.
+-- The AI Campaign Copilot writes a human-approved campaign brief here when the
+-- marketer clicks "Approve & Add to Campaign" (nothing is auto-sent).
 CREATE TABLE IF NOT EXISTS fan360.activation_history (
     activation_id       TEXT PRIMARY KEY,
     supporter_id        TEXT NOT NULL,
@@ -53,5 +55,12 @@ CREATE TABLE IF NOT EXISTS fan360.activation_history (
     selected_action     TEXT,
     campaign            TEXT,
     created_at          TIMESTAMP DEFAULT now(),
-    status              TEXT DEFAULT 'queued'
+    status              TEXT DEFAULT 'queued',
+    -- AI Campaign Copilot write-back (human-approved)
+    next_best_action    TEXT,
+    campaign_objective  TEXT,
+    recommended_channel TEXT,
+    campaign_message    TEXT,
+    approved_by_user    TEXT,
+    approved_at         TIMESTAMP
 );

@@ -1,0 +1,51 @@
+==========================================================================
+ARSENAL FAN 360 :: SYNTHETIC DATA PROFILE
+Computed directly from generated records - no hard-coded values.
+Reference 'now': 2025-09-20 12:00:00   recent window: last 30 days
+==========================================================================
+
+-- Volumes (valid records) --
+  supporters           5,000
+  web_events          20,000
+  ecommerce_orders     8,030  (incl. 30 intentional duplicates)
+  ticket_orders        5,000
+  marketing_events    10,000
+
+-- Membership --
+  members              2,052  (41.0%)
+  non-members          2,948  (59.0%)
+
+-- Designed persona mix (drives behaviour) --
+  casual              1,280  (25.6%)
+  ticket_browser        689  (13.8%)
+  cart_abandoner        676  (13.5%)
+  lapsed                664  (13.3%)
+  loyal_attendee        622  (12.4%)
+  intl_merch            579  (11.6%)
+  big_spender           490  (9.8%)
+
+-- Derived behavioural cohorts (the signals the NBA engine finds) --
+  ticket browsers w/ NO ticket purchase (>=2 views 30d) :   193
+  frequent attendees (>=3) who are NOT members          :   157
+  cart abandoners (>=1 abandon 30d)                     :   808
+  VIP / high merch spend (>= £300)                      :   459
+  international supporters (non-UK)                      : 2,228
+  supporters with any merch purchase                    : 3,839
+  supporters with any ticket purchase                   : 3,057
+
+-- Temporal realism --
+  web events in last 30 days                            : 10,965  (54.8%)
+  (lapsed supporters skew old; active supporters skew recent - see data/README.md)
+
+-- Injected data-quality edge cases (for pipeline expectations) --
+  dirty supporter rows (casing/whitespace/missing age)  : 40
+  duplicate ecommerce orders (Silver de-dup)            : 30
+  MALFORMED rows appended per source (expectations DROP):
+      supporters         2
+      web_events         5
+      ecommerce_orders   4
+      ticket_orders      2
+      marketing_events   2
+  total malformed rows across sources                   : 15
+
+==========================================================================

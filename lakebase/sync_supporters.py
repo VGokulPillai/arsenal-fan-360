@@ -93,6 +93,16 @@ CREATE TABLE IF NOT EXISTS {SCHEMA}.activation_history (
     status TEXT DEFAULT 'queued'
 );
 """)
+# extended write-back columns for the AI Campaign Copilot (human-approved briefs)
+for col, coltype in [
+    ("next_best_action", "TEXT"), ("campaign_objective", "TEXT"),
+    ("recommended_channel", "TEXT"), ("campaign_message", "TEXT"),
+    ("approved_by_user", "TEXT"), ("approved_at", "TIMESTAMP"),
+]:
+    try:
+        cur.execute(f"ALTER TABLE {SCHEMA}.activation_history ADD COLUMN IF NOT EXISTS {col} {coltype};")
+    except Exception as e:
+        print("alter skipped:", str(e)[:80])
 # make readable/writable by the app service principal (auto-provisioned role)
 for stmt in [
     f"GRANT USAGE ON SCHEMA {SCHEMA} TO PUBLIC;",
@@ -117,8 +127,25 @@ def opportunity_type(a):
         "Stadium Tour": "Experience",
     }.get(a, "Experience")
 
-gold = spark.table(f"{CAT}.af360_gold.gold_supporter_360").toPandas()
-print("Gold rows to sync:", len(gold))
+# JOIN the SDP-owned Customer 360 with the ML intelligence overlay
+# (gold_supporter_scores). The SDP owns gold_supporter_360; the ML job owns
+# gold_supporter_scores. We prefer the ML intent score / NBA / GenAI reason
+# where present, falling back to the pipeline's rule-based baseline.
+gold = spark.sql(f"""
+  SELECT g.supporter_id, g.first_name, g.age_band, g.country, g.city, g.membership_tier,
+         g.favourite_player, g.favourite_product_category, g.season_ticket_holder,
+         g.total_ticket_spend, g.total_merchandise_spend, g.total_customer_value,
+         g.matches_attended, g.ticket_views_30d, g.product_views_30d, g.cart_abandons_30d,
+         g.membership_views_30d, g.marketing_opens_30d, g.marketing_clicks_30d,
+         g.days_since_last_purchase, g.days_since_last_activity,
+         CAST(g.engagement_score AS INT)                                      AS engagement_score,
+         CAST(COALESCE(s.purchase_intent_score, g.purchase_intent_score) AS INT) AS purchase_intent_score,
+         COALESCE(s.recommended_next_action, g.recommended_next_action)       AS recommended_next_action,
+         COALESCE(s.genai_reason, g.recommendation_reason)                    AS recommendation_reason
+  FROM {CAT}.af360_gold.gold_supporter_360 g
+  LEFT JOIN {CAT}.af360_gold.gold_supporter_scores s USING (supporter_id)
+""").toPandas()
+print("Gold rows to sync (360 + ML scores):", len(gold))
 
 prof_rows = [(
     r.supporter_id, r.first_name, r.age_band, r.country, r.city, r.membership_tier,
@@ -163,9 +190,14 @@ print("Hero supporter:", hero)
 act_id = f"act-{uuid.uuid4().hex[:10]}"
 cur.execute(f"""
   INSERT INTO {SCHEMA}.activation_history
-    (activation_id, supporter_id, recommended_action, selected_action, campaign, status)
-  VALUES (%s, %s, %s, %s, %s, %s)
-""", (act_id, hero[0], hero[2], hero[2], "Autumn Membership Drive", "queued"))
+    (activation_id, supporter_id, recommended_action, selected_action, campaign, status,
+     next_best_action, campaign_objective, recommended_channel, campaign_message,
+     approved_by_user, approved_at)
+  VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, now())
+""", (act_id, hero[0], hero[2], hero[2], "Autumn Membership Drive", "queued",
+      hero[2], "Convert a high-intent non-member to paid membership",
+      "Email", "Seed activation created by the Lakebase sync job (demo hero).",
+      "system_seed"))
 print("Wrote activation:", act_id)
 
 cur.execute(f"SELECT * FROM {SCHEMA}.activation_history ORDER BY created_at DESC LIMIT 5;")

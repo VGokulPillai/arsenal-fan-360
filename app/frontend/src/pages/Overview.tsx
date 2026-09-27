@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { api, Overview as OverviewData } from "../lib/api";
+import { api, Overview as OverviewData, Executive } from "../lib/api";
 import KPITile from "../components/KPITile";
-import { Users, Flame, PoundSterling, Ticket, Target } from "lucide-react";
+import { Users, Flame, PoundSterling, Ticket, Target, Briefcase, UserCog, TrendingUp } from "lucide-react";
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell,
   PieChart, Pie, LineChart, Line, CartesianGrid,
@@ -21,12 +21,31 @@ function Panel({ title, children }: { title: string; children: React.ReactNode }
   );
 }
 
+function PersonaCard({ icon, kind, role, pressures }: { icon: React.ReactNode; kind: string; role: string; pressures: string[] }) {
+  return (
+    <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+      <div className="flex items-center gap-2 text-arsenal-gold">
+        {icon}
+        <span className="text-xs uppercase tracking-widest text-white/50">{kind}</span>
+      </div>
+      <div className="text-white font-semibold text-lg mt-1">{role}</div>
+      <ul className="mt-2 space-y-1">
+        {pressures.slice(0, 6).map((p) => (
+          <li key={p} className="text-white/70 text-sm flex gap-2"><span className="text-arsenal-red">•</span>{p}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 export default function Overview() {
   const [d, setD] = useState<OverviewData | null>(null);
+  const [ex, setEx] = useState<Executive | null>(null);
   const [err, setErr] = useState("");
 
   useEffect(() => {
     api.overview().then(setD).catch((e) => setErr(String(e)));
+    api.executive().then(setEx).catch(() => {});
   }, []);
 
   if (err) return <div className="text-rose-300">Failed to load overview: {err}</div>;
@@ -39,10 +58,65 @@ export default function Overview() {
       <div>
         <h1 className="font-display text-4xl tracking-wider text-white uppercase">Arsenal Fan 360</h1>
         <p className="text-white/60 mt-1">
-          Turn supporter signals into the next best action ·{" "}
+          Commercial Command Centre · turn supporter signals into the next best action ·{" "}
           <span className="text-arsenal-gold">{d.data_source}</span>
         </p>
       </div>
+
+      {ex && (
+        <div className="glass-card p-5 space-y-5">
+          <h3 className="font-arsenal-bebas tracking-widest text-white/90 uppercase text-lg">Executive Lens</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <PersonaCard icon={<Briefcase className="w-4 h-4" />} kind={ex.personas.economic_buyer.kind}
+              role={ex.personas.economic_buyer.role} pressures={ex.personas.economic_buyer.pressures} />
+            <PersonaCard icon={<UserCog className="w-4 h-4" />} kind={ex.personas.operational_owner.kind}
+              role={ex.personas.operational_owner.role} pressures={ex.personas.operational_owner.pressures} />
+          </div>
+
+          <div>
+            <div className="text-xs uppercase tracking-widest text-white/50 mb-2">Commercial KPIs</div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <KPITile title="Total Supporter Value" value={gbp(ex.commercial_kpis.total_supporter_value)} icon={<PoundSterling className="w-5 h-5" />} />
+              <KPITile title="High-Intent Supporters" value={ex.commercial_kpis.high_intent_supporters.toLocaleString()} subtitle="intent ≥ 70" icon={<Flame className="w-5 h-5" />} />
+              <KPITile title="High-Intent Value" value={gbp(ex.commercial_kpis.high_intent_value)} icon={<TrendingUp className="w-5 h-5" />} />
+              <KPITile title="Membership Opportunity" value={gbp(ex.commercial_kpis.membership_opportunity.value)} subtitle={`${ex.commercial_kpis.membership_opportunity.count} supporters`} icon={<Target className="w-5 h-5" />} />
+            </div>
+          </div>
+
+          <div>
+            <div className="text-xs uppercase tracking-widest text-white/50 mb-2">Commercial Opportunities</div>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              {([
+                ["Ticket Intent", ex.commercial_kpis.ticket_intent],
+                ["Membership", ex.commercial_kpis.membership_opportunity],
+                ["Merchandise", ex.commercial_kpis.merchandise_opportunity],
+                ["Hospitality", ex.commercial_kpis.hospitality_opportunity],
+                ["Re-engagement", ex.commercial_kpis.reengagement_opportunity],
+              ] as const).map(([label, m]) => (
+                <div key={label} className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
+                  <div className="text-white/80 text-sm font-semibold">{label}</div>
+                  <div className="text-white text-lg">{gbp(m.value)}</div>
+                  <div className="text-white/50 text-xs">{m.count} supporters · avg intent {m.avg_intent}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded-xl border border-arsenal-gold/30 bg-arsenal-gold/[0.05] p-4">
+            <div className="flex items-center gap-2 text-arsenal-gold">
+              <TrendingUp className="w-4 h-4" />
+              <span className="text-xs uppercase tracking-widest">Illustrative Business Case</span>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-3">
+              <div><div className="text-white/50 text-xs">Incremental Contribution</div><div className="text-white text-xl font-semibold">{gbp(ex.business_case.illustrative_results.incremental_gross_contribution)}</div></div>
+              <div><div className="text-white/50 text-xs">ROI</div><div className="text-white text-xl font-semibold">{ex.business_case.illustrative_results.roi_x}× ({ex.business_case.illustrative_results.roi_pct}%)</div></div>
+              <div><div className="text-white/50 text-xs">Payback</div><div className="text-white text-xl font-semibold">{ex.business_case.illustrative_results.payback_months ?? "—"} mo</div></div>
+              <div><div className="text-white/50 text-xs">Scaled Addressable</div><div className="text-white text-xl font-semibold">{gbp(ex.business_case.illustrative_results.scaled_addressable_value)}</div></div>
+            </div>
+            <p className="text-white/40 text-xs mt-3 italic">{ex.business_case.disclaimer}</p>
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         <KPITile title="Total Supporters" value={d.kpis.total_supporters.toLocaleString()} icon={<Users className="w-5 h-5" />} />

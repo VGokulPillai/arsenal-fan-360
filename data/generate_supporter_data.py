@@ -218,7 +218,14 @@ def generate(out_dir: str, seed: int,
     for d in dirty[30:40]:
         d["age_band"] = ""                            # missing value
 
-    _write_csv(os.path.join(out_dir, "supporters.csv"), supporters)
+    # append MALFORMED supporter rows (hard integrity failures the pipeline
+    # expectations must DROP: missing supporter_id). Appended AFTER all valid
+    # draws so the 5,000 valid supporters remain deterministic/byte-identical.
+    bad_supporters = [
+        {**supporters[0], "supporter_id": ""},        # empty id -> DROP
+        {**supporters[1], "supporter_id": None},       # null id  -> DROP
+    ]
+    _write_csv(os.path.join(out_dir, "supporters.csv"), supporters + bad_supporters)
 
     sids = [s["supporter_id"] for s in supporters]
 
@@ -262,7 +269,16 @@ def generate(out_dir: str, seed: int,
             "session_id": f"SESS{rng.randint(100000, 999999)}",
             "event_type": et,
         })
-    _write_csv(os.path.join(out_dir, "web_events.csv"), web)
+    # append MALFORMED web events (expectations DROP: missing supporter_id /
+    # missing event_timestamp; WARN: unknown event_type)
+    bad_web = [
+        {"supporter_id": "",       "event_timestamp": "2025-09-10 10:00:00", "page_type": "Store",   "page_name": "Cart",   "product_id": "P1001", "match_id": "", "session_id": "SESS000001", "event_type": "added_to_cart"},
+        {"supporter_id": None,     "event_timestamp": "2025-09-11 11:00:00", "page_type": "Tickets", "page_name": "Buy",    "product_id": "",      "match_id": "M001", "session_id": "SESS000002", "event_type": "viewed_match_ticket"},
+        {"supporter_id": sids[0],  "event_timestamp": "",                    "page_type": "News",    "page_name": "Latest", "product_id": "",      "match_id": "", "session_id": "SESS000003", "event_type": "viewed_news"},
+        {"supporter_id": sids[1],  "event_timestamp": "not-a-timestamp",     "page_type": "Store",   "page_name": "Shirt",  "product_id": "P1002", "match_id": "", "session_id": "SESS000004", "event_type": "viewed_home_shirt"},
+        {"supporter_id": sids[2],  "event_timestamp": "2025-09-12 09:30:00", "page_type": "Unknown", "page_name": "??",     "product_id": "",      "match_id": "", "session_id": "SESS000005", "event_type": "???invalid"},
+    ]
+    _write_csv(os.path.join(out_dir, "web_events.csv"), web + bad_web)
 
     # ---- Ecommerce orders -------------------------------------------------
     ecom = []
@@ -295,9 +311,18 @@ def generate(out_dir: str, seed: int,
             "purchase_timestamp": ts.isoformat(sep=" "),
         })
     # duplicate a handful of orders to test Silver de-duplication
-    for dup in rng.sample(ecom, 30):
+    n_dupes = 30
+    for dup in rng.sample(ecom, n_dupes):
         ecom.append(dict(dup))
-    _write_csv(os.path.join(out_dir, "ecommerce_orders.csv"), ecom)
+    # append MALFORMED ecommerce orders (expectations DROP: missing order_id /
+    # missing supporter_id / negative revenue)
+    bad_ecom = [
+        {"supporter_id": sids[3], "order_id": "",       "product": "Home Shirt 2024/25", "category": "Home Shirt", "quantity": 1, "revenue": 80.0,  "purchase_timestamp": "2025-09-10 12:00:00"},
+        {"supporter_id": "",      "order_id": "O9999991","product": "Away Shirt 2024/25", "category": "Away Shirt", "quantity": 1, "revenue": 80.0,  "purchase_timestamp": "2025-09-10 12:00:00"},
+        {"supporter_id": sids[4], "order_id": "O9999992","product": "Accessories 2024/25","category": "Accessories","quantity": 1, "revenue": -25.0, "purchase_timestamp": "2025-09-10 12:00:00"},
+        {"supporter_id": sids[5], "order_id": "O9999993","product": "Retro 2024/25",      "category": "Retro",      "quantity": 1, "revenue": -5.0,  "purchase_timestamp": "2025-09-10 12:00:00"},
+    ]
+    _write_csv(os.path.join(out_dir, "ecommerce_orders.csv"), ecom + bad_ecom)
 
     # ---- Ticket orders ----------------------------------------------------
     tickets = []
@@ -326,7 +351,13 @@ def generate(out_dir: str, seed: int,
             "purchase_timestamp": ts.isoformat(sep=" "),
             "attended": attended,
         })
-    _write_csv(os.path.join(out_dir, "ticket_orders.csv"), tickets)
+    # append MALFORMED ticket orders (expectations DROP: missing supporter_id /
+    # negative ticket_price)
+    bad_tix = [
+        {"supporter_id": "",      "match": "Arsenal vs Chelsea", "competition": "Premier League", "ticket_type": "General Admission", "ticket_price": 55.0,  "purchase_timestamp": "2025-08-01 12:00:00", "attended": False},
+        {"supporter_id": sids[6], "match": "Arsenal vs Everton", "competition": "Premier League", "ticket_type": "Club Level",        "ticket_price": -120.0,"purchase_timestamp": "2025-08-02 12:00:00", "attended": False},
+    ]
+    _write_csv(os.path.join(out_dir, "ticket_orders.csv"), tickets + bad_tix)
 
     # ---- Marketing events -------------------------------------------------
     marketing = []
@@ -358,17 +389,136 @@ def generate(out_dir: str, seed: int,
             "converted": converted,
             "timestamp": ts.isoformat(sep=" "),
         })
-    _write_csv(os.path.join(out_dir, "marketing_events.csv"), marketing)
+    # append MALFORMED marketing events (expectations DROP: missing
+    # supporter_id / missing timestamp)
+    bad_mkt = [
+        {"supporter_id": "",      "campaign": "New Home Kit Launch", "sent": True, "opened": True,  "clicked": False, "converted": False, "timestamp": "2025-09-05 08:00:00"},
+        {"supporter_id": sids[7], "campaign": "Membership Drive",    "sent": True, "opened": False, "clicked": False, "converted": False, "timestamp": ""},
+    ]
+    _write_csv(os.path.join(out_dir, "marketing_events.csv"), marketing + bad_mkt)
 
     # ---- Summary ----------------------------------------------------------
     summary = {
-        "supporters": len(supporters),
-        "web_events": len(web),
-        "ecommerce_orders": len(ecom),
-        "ticket_orders": len(tickets),
-        "marketing_events": len(marketing),
+        "supporters": len(supporters) + len(bad_supporters),
+        "web_events": len(web) + len(bad_web),
+        "ecommerce_orders": len(ecom) + len(bad_ecom),
+        "ticket_orders": len(tickets) + len(bad_tix),
+        "marketing_events": len(marketing) + len(bad_mkt),
     }
-    return summary
+    # profile is computed from the in-memory valid records + injected anomalies
+    _profile = compute_profile(
+        supporters, web, ecom, tickets, marketing, personas,
+        dirty_rows=40, dup_orders=n_dupes,
+        malformed={"supporters": len(bad_supporters), "web_events": len(bad_web),
+                   "ecommerce_orders": len(bad_ecom), "ticket_orders": len(bad_tix),
+                   "marketing_events": len(bad_mkt)},
+        now=now, recent_start=recent_start)
+    with open(os.path.join(out_dir, "..", "..", "evidence", "synthetic_data_profile.txt"), "w") as f:
+        f.write(_profile)
+    return summary, _profile
+
+
+def compute_profile(supporters, web, ecom, tickets, marketing, personas,
+                    dirty_rows, dup_orders, malformed, now, recent_start):
+    """Compute REAL cohort statistics from the generated (valid) records.
+
+    Everything here is derived from the data itself - nothing is hard-coded.
+    """
+    from collections import Counter
+    sids = [s["supporter_id"] for s in supporters]
+    n = len(supporters)
+
+    # membership
+    members = [s for s in supporters if s["membership_tier"].strip() not in ("None", "Free", "")]
+    non_members = n - len(members)
+
+    # per-supporter behavioural aggregates (last 30 days vs all-time)
+    def recent(ts_str):
+        try:
+            return datetime.fromisoformat(ts_str) >= recent_start
+        except Exception:
+            return False
+
+    ticket_views = Counter()
+    cart_abandons = Counter()
+    product_views = Counter()
+    for e in web:
+        sid = e["supporter_id"]
+        if e["event_type"] == "viewed_match_ticket" and recent(e["event_timestamp"]):
+            ticket_views[sid] += 1
+        if e["event_type"] == "abandoned_cart" and recent(e["event_timestamp"]):
+            cart_abandons[sid] += 1
+        if e["page_type"] == "Store" and recent(e["event_timestamp"]):
+            product_views[sid] += 1
+
+    buyers = set(o["supporter_id"] for o in ecom)
+    ticket_buyers = set(t["supporter_id"] for t in tickets)
+    attended = Counter()
+    for t in tickets:
+        if t["attended"]:
+            attended[t["supporter_id"]] += 1
+    merch_spend = Counter()
+    for o in ecom:
+        merch_spend[o["supporter_id"]] += o["revenue"]
+
+    # cohorts (derived)
+    ticket_browsers_no_buy = [s for s in sids if ticket_views[s] >= 2 and s not in ticket_buyers]
+    frequent_non_members = [s for s in sids
+                            if attended[s] >= 3 and
+                            next(x for x in supporters if x["supporter_id"] == s)["membership_tier"].strip() in ("None", "Free", "")]
+    cart_abandoner_cohort = [s for s in sids if cart_abandons[s] >= 1]
+    vip = [s for s in sids if merch_spend[s] >= 300]
+    intl = [s for s in supporters if s["country"].strip().title() != "United Kingdom"]
+
+    # persona distribution (design intent)
+    persona_counts = Counter(personas.values())
+
+    L = []
+    A = L.append
+    A("=" * 74)
+    A("ARSENAL FAN 360 :: SYNTHETIC DATA PROFILE")
+    A("Computed directly from generated records - no hard-coded values.")
+    A(f"Reference 'now': {now.isoformat(sep=' ')}   recent window: last 30 days")
+    A("=" * 74)
+    A("\n-- Volumes (valid records) --")
+    A(f"  supporters        {n:>8,}")
+    A(f"  web_events        {len(web):>8,}")
+    A(f"  ecommerce_orders  {len(ecom):>8,}  (incl. {dup_orders} intentional duplicates)")
+    A(f"  ticket_orders     {len(tickets):>8,}")
+    A(f"  marketing_events  {len(marketing):>8,}")
+
+    A("\n-- Membership --")
+    A(f"  members           {len(members):>8,}  ({100*len(members)/n:.1f}%)")
+    A(f"  non-members       {non_members:>8,}  ({100*non_members/n:.1f}%)")
+
+    A("\n-- Designed persona mix (drives behaviour) --")
+    for p, c in persona_counts.most_common():
+        A(f"  {p:<18} {c:>6,}  ({100*c/n:.1f}%)")
+
+    A("\n-- Derived behavioural cohorts (the signals the NBA engine finds) --")
+    A(f"  ticket browsers w/ NO ticket purchase (>=2 views 30d) : {len(ticket_browsers_no_buy):>5,}")
+    A(f"  frequent attendees (>=3) who are NOT members          : {len(frequent_non_members):>5,}")
+    A(f"  cart abandoners (>=1 abandon 30d)                     : {len(cart_abandoner_cohort):>5,}")
+    A(f"  VIP / high merch spend (>= £300)                      : {len(vip):>5,}")
+    A(f"  international supporters (non-UK)                      : {len(intl):>5,}")
+    A(f"  supporters with any merch purchase                    : {len(buyers):>5,}")
+    A(f"  supporters with any ticket purchase                   : {len(ticket_buyers):>5,}")
+
+    A("\n-- Temporal realism --")
+    recent_web = sum(1 for e in web if recent(e["event_timestamp"]))
+    A(f"  web events in last 30 days                            : {recent_web:>6,}  ({100*recent_web/len(web):.1f}%)")
+    A(f"  (lapsed supporters skew old; active supporters skew recent - see data/README.md)")
+
+    A("\n-- Injected data-quality edge cases (for pipeline expectations) --")
+    A(f"  dirty supporter rows (casing/whitespace/missing age)  : {dirty_rows}")
+    A(f"  duplicate ecommerce orders (Silver de-dup)            : {dup_orders}")
+    A(f"  MALFORMED rows appended per source (expectations DROP):")
+    for k, v in malformed.items():
+        A(f"      {k:<18} {v}")
+    total_bad = sum(malformed.values())
+    A(f"  total malformed rows across sources                   : {total_bad}")
+    A("\n" + "=" * 74)
+    return "\n".join(L) + "\n"
 
 
 def _write_csv(path: str, rows: list[dict]):
@@ -388,13 +538,14 @@ def main():
     ap.add_argument("--seed", type=int, default=7)
     args = ap.parse_args()
 
-    summary = generate(args.out, args.seed)
+    summary, profile = generate(args.out, args.seed)
     print("=" * 60)
     print("Arsenal Fan 360 - synthetic data generated")
     print("=" * 60)
     for k, v in summary.items():
         print(f"  {k:<20} {v:>8,} rows")
     print(f"\nOutput directory: {os.path.abspath(args.out)}")
+    print("\n" + profile)
 
 
 if __name__ == "__main__":

@@ -8,6 +8,7 @@ venv/
 # Node / frontend build tooling
 node_modules/
 app/frontend/node_modules/
+app/frontend/node_modules
 .vite/
 
 # Local deploy staging (regenerated at deploy time)

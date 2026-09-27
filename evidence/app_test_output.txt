@@ -1,73 +1,90 @@
-ARSENAL FAN 360 — DEPLOYED APP TEST EVIDENCE (LIVE Lakebase + LIVE Genie)
-Generated: 2026-09-26T23:53:44Z
+==============================================================================
+ARSENAL FAN 360 :: LIVE DATABRICKS APP TEST OUTPUT
 App URL: https://arsenal-fan-360-7474651167448568.aws.databricksapps.com
-App service principal: a3448142-a85d-4efb-924a-0b7f8358c189
-Lakebase resource attached: instance=arsenal-lakebase db=databricks_postgres schema=fan360
-Genie grant: app SP has CAN_RUN on space 01f1b9fe891814be841d05a418e8b32d + SELECT on af360_gold + CAN_USE warehouse
+Captured: 2026-09-27T01:56:49Z
+All calls hit the DEPLOYED Databricks App (not local). Auth via workspace OAuth.
+==============================================================================
 
-== GET /api/health  (note data_source + lakebase:true) ==
-{"status":"ok","app":"arsenal-fan-360","data_source":"Databricks Lakebase (operational)","lakebase":true,"supporters_loaded":5000}
-
-== POST /api/activation  (LIVE write to Lakebase fan360.activation_history) ==
+### GET /api/health  -> app is live and reading Lakebase
 {
-    "activation_id": "act-92420e2b44",
-    "supporter_id": "S004917",
+    "status": "ok",
+    "app": "arsenal-fan-360",
+    "data_source": "Databricks Lakebase (operational)",
+    "lakebase": true,
+    "supporters_loaded": 5000
+}
+
+### GET /api/overview  -> KPIs computed from operational store
+kpis     : {"total_supporters": 5000, "high_intent": 333, "revenue": 1175207, "matches_attended": 3919, "open_opportunities": 2748}
+source   : Databricks Lakebase (operational)
+actions  : [{"action": "Stadium Tour", "count": 2252}, {"action": "Arsenal Shirt / Merchandise", "count": 919}, {"action": "Membership Upgrade", "count": 803}, {"action": "Hospitality", "count": 522}, {"action": "Re-engagement Campaign", "count": 311}, {"action": "Match Ticket", "count": 193}]
+
+### GET /api/executive  -> personas + commercial KPIs + illustrative business case
+economic_buyer   : Chief Commercial Officer
+operational_owner: Head of Fan Engagement / CRM
+total_supporter_value : 1175207
+high_intent_supporters: 333
+high_intent_value     : 76152
+membership_opportunity: {"count": 803, "value": 233432, "avg_intent": 21}
+hospitality_opportunity: {"count": 522, "value": 190366, "avg_intent": 23}
+business_case_results : {"scaled_addressable_value": 34393928, "incremental_converted_value": 687879, "incremental_gross_contribution": 412727, "annual_platform_cost": 120000, "roi_x": 2.44, "roi_pct": 244, "payback_months": 3.5}
+disclaimer            : Illustrative scenario — not actual Arsenal financial performance. Observed values are computed from synthetic supporter data (5,000-supporter sample); the scenario scales the observed addressable opportunity to a representative supporter base and applies the tunable assumptions above.
+
+### GET /api/campaign-brief/S004917  -> LIVE Foundation Model, grounded in supplied facts
+{
     "recommended_action": "Match Ticket",
-    "selected_action": "Hospitality",
-    "campaign": "Emirates Hospitality Q4",
-    "created_at": "2026-09-26T23:53:46.111518",
+    "objective": "Convert Emile from a non-member, non-attending supporter into a first-time match ticket purchaser by capitalising on his demonstrated browsing intent.",
+    "why_now": "Emile has viewed tickets 3 times and a membership page once in the last 30 days, holds a purchase intent score of 82, and was active just 1 day ago \u2014 signalling he is at a critical decision point.",
+    "recommended_channel": "Email / App Push",
+    "offer_angle": "First match experience framing \u2014 position a ticket purchase as Emile's opportunity to watch Arsenal live for the first time, tailored to a US-based supporter who has shown clear browsing interest but has not yet committed.",
+    "suggested_message": "Emile, you've been eyeing a match \u2014 now's the time. Secure your seat at Emirates Stadium and experience Arsenal live. Don't let the moment pass. Get your ticket today.",
+    "primary_kpi": "Ticket conversion rate",
+    "supporting_kpi": "Revenue per targeted supporter",
+    "risk_guardrail": "Do not reference membership upsell in this touchpoint \u2014 Emile has zero membership tier and only one membership page view. Introducing membership alongside a ticket offer risks message dilution and decision fatigue, reducing conversion likelihood.",
+    "generated_by": "GenAI (databricks-claude-sonnet-4-6)",
+    "disclaimer": "AI-generated campaign brief \u2014 human approval required. No campaign is sent automatically."
+}
+
+### POST /api/activation  -> human-approved write-back persisted to Lakebase
+{
+    "activation_id": "act-713f6c5305",
+    "supporter_id": "S004917",
+    "next_best_action": "Match Ticket",
+    "campaign_objective": "Convert Emile ticket browsing into first match attendance",
+    "recommended_channel": "Email / App Push",
+    "campaign_message": "Emile, secure your seat at Emirates Stadium.",
+    "approved_by_user": "marketing_user",
+    "approved_at": "2026-09-27T01:56:59.125136",
     "status": "queued",
     "store": "Databricks Lakebase"
 }
 
-== GET /api/activations  (read back from Lakebase; incl. row written earlier by the sync notebook) ==
-[
-    {
-        "activation_id": "act-92420e2b44",
-        "supporter_id": "S004917",
-        "recommended_action": "Match Ticket",
-        "selected_action": "Hospitality",
-        "campaign": "Emirates Hospitality Q4",
-        "created_at": "2026-09-26 23:53:46.643162",
-        "status": "queued"
-    },
-    {
-        "activation_id": "act-9a5849cf2a",
-        "supporter_id": "S004917",
-        "recommended_action": "Match Ticket",
-        "selected_action": "Match Ticket",
-        "campaign": "Live Lakebase E2E",
-        "created_at": "2026-09-26 23:50:33.053786",
-        "status": "queued"
-    },
-    {
-        "activation_id": "act-75734a7fcd",
-        "supporter_id": "S004917",
-        "recommended_action": "Match Ticket",
-        "selected_action": "Match Ticket",
-        "campaign": "Autumn Membership Drive",
-        "created_at": "2026-09-26 23:08:49.362149",
-        "status": "queued"
-    }
-]
+### GET /api/activations  -> read back from Lakebase fan360.activation_history
+recent activations: 5
+   act-713f6c5305 | S004917 | Match Ticket | marketing_user | queued
+   act-d2edd7f461 | S004917 | Match Ticket | marketing_user | queued
+   act-92420e2b44 | S004917 | None | None | queued
+   act-9a5849cf2a | S004917 | None | None | queued
+   act-75734a7fcd | S004917 | None | None | queued
 
-== GET /api/supporter/S004917  (profile from live Lakebase join) ==
-name: Emile
-intent: 82
-nba: Match Ticket
-reason: Emile's high intent score and recent ticket browsing activity signal strong match attendance interest, making a targeted ticket offer the ideal next step to con
+### GET /api/genie/suggestions  -> executive / commercial questions
+{
+    "questions": [
+        "How much supporter value sits in high-intent supporters?",
+        "How much commercial value is associated with non-members?",
+        "How many frequent attendees are not currently members?",
+        "How much supporter value is currently flagged for hospitality?",
+        "How many lapsing supporters should we re-engage?",
+        "What are the biggest commercial opportunities by supporter value?"
+    ]
+}
 
-== POST /api/genie/ask  (LIVE Databricks Genie Space) ==
+### POST /api/genie/ask  -> answered by the LIVE Databricks Genie Space
 source: Databricks Genie Space
-answer: The **top 5 supporters by purchase intent** are:
-- **Emile** (**S004917**) — **82** — **Match Ticket**
-- **Martin** (**S003160**) — **80** — **Arsenal Shirt / Merchandise**
-- **Gabriel** (**S000246**) — **78** — **Arsenal Shirt / Merchandise**
-- **Diego** (**S000643**) — **78** — **Arsenal Shirt / Merchandise**
-- **Kenji** (**S001915**) — **78** — **Membership Upgrade**
+answer: The total supporter value held by **high-intent supporters** is **76,152.02**. Based on the result shown, the combined value across supporters with a purchase intent score of **70 or higher** is **76,152.02**.
 
-All 5 supporters shown are **high intent** (scores of **78–82**), with **merchandise** being the most common recommended next step.
-
-== POST /api/genie/ask  (second live question) ==
-source: Databricks Genie Space
-answer: Revenue was **501,764.99** from **members** and **673,441.98** from **non-members**. **Non-members generated more revenue**, by about **171,676.99** based on the two groups shown.
+==============================================================================
+SUMMARY: deployed app serves LIVE from Lakebase (5,000 supporters); the AI
+Campaign Copilot calls the live Foundation Model and stays grounded; human-
+approved activations persist to Lakebase; Genie answers executive questions.
+==============================================================================

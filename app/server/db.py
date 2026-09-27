@@ -74,6 +74,30 @@ def available() -> bool:
     return _pg_ok
 
 
+def ensure_schema() -> None:
+    """Idempotently ensure the AI Campaign Copilot write-back columns exist.
+
+    Safe to call on every startup; if Lakebase is unreachable this is a no-op.
+    """
+    conn = _connect()
+    if not conn:
+        return
+    try:
+        cur = conn.cursor()
+        for col, coltype in [
+            ("next_best_action", "TEXT"), ("campaign_objective", "TEXT"),
+            ("recommended_channel", "TEXT"), ("campaign_message", "TEXT"),
+            ("approved_by_user", "TEXT"), ("approved_at", "TIMESTAMP"),
+        ]:
+            cur.execute(
+                f"ALTER TABLE {config.PG_SCHEMA}.activation_history "
+                f"ADD COLUMN IF NOT EXISTS {col} {coltype};")
+        conn.commit(); cur.close(); conn.close()
+        logger.info("Lakebase activation_history schema ensured.")
+    except Exception as e:
+        logger.warning("Lakebase ensure_schema skipped: %s", e)
+
+
 def load_profiles() -> list[dict]:
     """Read supporter_profile + next_best_action from Lakebase (or [] if unavailable)."""
     conn = _connect()
@@ -95,15 +119,18 @@ def load_profiles() -> list[dict]:
         return []
 
 
-def write_activation(supporter_id, recommended_action, selected_action, campaign) -> dict:
-    """Write an activation to Lakebase (or in-memory fallback)."""
+def write_activation(supporter_id, next_best_action, campaign_objective="",
+                     recommended_channel="", campaign_message="", approved_by_user="marketing_user") -> dict:
+    """Write an approved AI-Campaign-Copilot activation to Lakebase (or in-memory fallback)."""
     act = {
         "activation_id": f"act-{uuid.uuid4().hex[:10]}",
         "supporter_id": supporter_id,
-        "recommended_action": recommended_action,
-        "selected_action": selected_action,
-        "campaign": campaign,
-        "created_at": datetime.datetime.utcnow().isoformat(),
+        "next_best_action": next_best_action,
+        "campaign_objective": campaign_objective,
+        "recommended_channel": recommended_channel,
+        "campaign_message": campaign_message,
+        "approved_by_user": approved_by_user,
+        "approved_at": datetime.datetime.utcnow().isoformat(),
         "status": "queued",
     }
     conn = _connect()
@@ -112,9 +139,12 @@ def write_activation(supporter_id, recommended_action, selected_action, campaign
             cur = conn.cursor()
             cur.execute(f"""
                 INSERT INTO {config.PG_SCHEMA}.activation_history
-                  (activation_id, supporter_id, recommended_action, selected_action, campaign, status)
-                VALUES (%s,%s,%s,%s,%s,%s)
-            """, (act["activation_id"], supporter_id, recommended_action, selected_action, campaign, "queued"))
+                  (activation_id, supporter_id, recommended_action, selected_action, campaign, status,
+                   next_best_action, campaign_objective, recommended_channel, campaign_message, approved_by_user, approved_at)
+                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s, now())
+            """, (act["activation_id"], supporter_id, next_best_action, next_best_action,
+                  campaign_objective, "queued", next_best_action, campaign_objective,
+                  recommended_channel, campaign_message, approved_by_user))
             conn.commit(); cur.close(); conn.close()
             act["store"] = "Databricks Lakebase"
             return act
@@ -130,11 +160,12 @@ def recent_activations(limit=20) -> list[dict]:
     if conn:
         try:
             cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-            cur.execute(f"SELECT * FROM {config.PG_SCHEMA}.activation_history ORDER BY created_at DESC LIMIT %s", (limit,))
+            cur.execute(f"SELECT * FROM {config.PG_SCHEMA}.activation_history ORDER BY COALESCE(approved_at, created_at) DESC LIMIT %s", (limit,))
             rows = [dict(r) for r in cur.fetchall()]
             cur.close(); conn.close()
             for r in rows:
                 r["created_at"] = str(r.get("created_at"))
+                r["approved_at"] = str(r.get("approved_at"))
             return rows
         except Exception as e:
             logger.warning("Lakebase recent_activations failed: %s", e)

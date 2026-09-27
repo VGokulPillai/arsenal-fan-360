@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { api, SupporterRow, SupporterDetail } from "../lib/api";
+import { api, SupporterRow, SupporterDetail, CampaignBrief } from "../lib/api";
 import IntentGauge from "../components/IntentGauge";
-import { Search, MapPin, Star, Trophy, PoundSterling, Mail, CheckCircle2, Send } from "lucide-react";
+import { Search, MapPin, Star, Trophy, PoundSterling, Mail, CheckCircle2, Send, Sparkles } from "lucide-react";
 
 function Stat({ icon, label, value }: { icon: React.ReactNode; label: string; value: string | number }) {
   return (
@@ -24,6 +24,8 @@ export default function Supporter360() {
   const [detail, setDetail] = useState<SupporterDetail | null>(null);
   const [activated, setActivated] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [brief, setBrief] = useState<CampaignBrief | null>(null);
+  const [briefing, setBriefing] = useState(false);
 
   useEffect(() => {
     api.supporters("", 12).then(setResults).catch(() => {});
@@ -32,20 +34,33 @@ export default function Supporter360() {
     if (id) {
       api.supporter(id).then(setDetail).catch(() => setDetail(null));
       setActivated(null);
+      setBrief(null);
     }
   }, [id]);
 
   const search = async () => setResults(await api.supporters(q, 15));
 
-  const activate = async () => {
+  const generateBrief = async () => {
     if (!detail) return;
+    setBriefing(true);
+    try {
+      setBrief(await api.campaignBrief(detail.profile.supporter_id));
+    } finally {
+      setBriefing(false);
+    }
+  };
+
+  const activate = async () => {
+    if (!detail || !brief) return;
     setBusy(true);
     try {
       const res = await api.activate({
         supporter_id: detail.profile.supporter_id,
-        recommended_action: detail.nba.action,
-        selected_action: detail.nba.action,
-        campaign: `${detail.nba.opportunity_type} Campaign`,
+        next_best_action: brief.recommended_action,
+        campaign_objective: brief.objective,
+        recommended_channel: brief.recommended_channel,
+        campaign_message: brief.suggested_message,
+        approved_by_user: "marketing_user",
       });
       setActivated(res.activation_id + " · " + res.store);
     } finally {
@@ -159,18 +174,53 @@ export default function Supporter360() {
               <h3 className="font-display text-2xl text-white mt-1 mb-3">{detail.nba.action}</h3>
               <p className="text-white/75 text-sm leading-relaxed italic">“{detail.nba.reason}”</p>
 
-              <button
-                onClick={activate}
-                disabled={busy || !!activated}
-                className="mt-5 w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-arsenal-red text-white font-semibold hover:bg-arsenal-red-dark disabled:opacity-60 transition"
-              >
-                {activated ? <CheckCircle2 className="w-4 h-4" /> : <Send className="w-4 h-4" />}
-                {activated ? "Added to Campaign" : busy ? "Writing to Lakebase…" : "Add to Campaign"}
-              </button>
-              {activated && (
-                <p className="mt-2 text-xs text-emerald-300 text-center">
-                  Activation written · {activated}
-                </p>
+              {!brief && (
+                <button
+                  onClick={generateBrief}
+                  disabled={briefing}
+                  className="mt-5 w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-white/10 border border-arsenal-gold/40 text-white font-semibold hover:bg-white/15 disabled:opacity-60 transition"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  {briefing ? "AI Copilot drafting…" : "Generate Campaign Brief"}
+                </button>
+              )}
+
+              {brief && (
+                <div className="mt-5 space-y-3">
+                  <div className="rounded-xl border border-arsenal-gold/30 bg-arsenal-gold/[0.05] p-4 space-y-2 text-sm">
+                    <div className="flex items-center gap-2 text-arsenal-gold">
+                      <Sparkles className="w-4 h-4" />
+                      <span className="text-xs uppercase tracking-widest">AI Campaign Brief</span>
+                    </div>
+                    <BriefRow label="Objective" value={brief.objective} />
+                    <BriefRow label="Why now" value={brief.why_now} />
+                    <BriefRow label="Channel" value={brief.recommended_channel} />
+                    <BriefRow label="Offer angle" value={brief.offer_angle} />
+                    <div>
+                      <p className="text-white/40 text-[11px] uppercase tracking-wide">Suggested message</p>
+                      <p className="text-white/90 italic border-l-2 border-arsenal-gold/50 pl-3 mt-1">“{brief.suggested_message}”</p>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <BriefRow label="Primary KPI" value={brief.primary_kpi} />
+                      <BriefRow label="Supporting KPI" value={brief.supporting_kpi} />
+                    </div>
+                    <BriefRow label="Risk / guardrail" value={brief.risk_guardrail} />
+                    <p className="text-white/40 text-[11px] pt-1">Generated by {brief.generated_by}</p>
+                  </div>
+                  <p className="text-amber-300/80 text-xs">{brief.disclaimer}</p>
+
+                  <button
+                    onClick={activate}
+                    disabled={busy || !!activated}
+                    className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-arsenal-red text-white font-semibold hover:bg-arsenal-red-dark disabled:opacity-60 transition"
+                  >
+                    {activated ? <CheckCircle2 className="w-4 h-4" /> : <Send className="w-4 h-4" />}
+                    {activated ? "Approved & Added" : busy ? "Writing to Lakebase…" : "Approve & Add to Campaign"}
+                  </button>
+                  {activated && (
+                    <p className="text-xs text-emerald-300 text-center">Activation written · {activated}</p>
+                  )}
+                </div>
               )}
             </div>
           </div>
@@ -182,4 +232,13 @@ export default function Supporter360() {
 
 function Ticketish() {
   return <span className="inline-block w-4 h-4">🎟️</span>;
+}
+
+function BriefRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <p className="text-white/40 text-[11px] uppercase tracking-wide">{label}</p>
+      <p className="text-white/85">{value}</p>
+    </div>
+  );
 }

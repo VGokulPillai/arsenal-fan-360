@@ -20,6 +20,10 @@ app.include_router(api_routes.router, prefix="/api")
 @app.on_event("startup")
 def _startup():
     try:
+        db.ensure_schema()   # idempotently add AI Copilot write-back columns
+    except Exception as e:
+        logger.warning("ensure_schema skipped: %s", e)
+    try:
         store.init()
     except Exception as e:
         logger.exception("store init failed: %s", e)

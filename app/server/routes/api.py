@@ -1,7 +1,7 @@
 """Arsenal Fan 360 API routes."""
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from .. import store, genie, db
+from .. import store, genie, db, copilot
 
 router = APIRouter()
 
@@ -9,6 +9,21 @@ router = APIRouter()
 @router.get("/overview")
 def overview():
     return store.overview()
+
+
+@router.get("/executive")
+def executive():
+    """Commercial command-centre metrics + illustrative business case (CCO / Head of Fan Engagement)."""
+    return store.executive()
+
+
+@router.get("/campaign-brief/{sid}")
+def campaign_brief(sid: str):
+    """AI Campaign Copilot: grounded, human-reviewable campaign brief for a supporter."""
+    b = copilot.brief(sid)
+    if b.get("error"):
+        raise HTTPException(404, b["error"])
+    return b
 
 
 @router.get("/supporters")
@@ -36,14 +51,18 @@ def opportunity_supporters(otype: str):
 
 class ActivationReq(BaseModel):
     supporter_id: str
-    recommended_action: str
-    selected_action: str
-    campaign: str
+    next_best_action: str
+    campaign_objective: str = ""
+    recommended_channel: str = ""
+    campaign_message: str = ""
+    approved_by_user: str = "marketing_user"
 
 
 @router.post("/activation")
 def activation(req: ActivationReq):
-    return db.write_activation(req.supporter_id, req.recommended_action, req.selected_action, req.campaign)
+    return db.write_activation(
+        req.supporter_id, req.next_best_action, req.campaign_objective,
+        req.recommended_channel, req.campaign_message, req.approved_by_user)
 
 
 @router.get("/activations")

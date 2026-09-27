@@ -10,6 +10,7 @@ import dbsql as d  # noqa (reuse warehouse client)
 
 CAT = "serverless_stable_1acr1x_catalog"
 G = f"{CAT}.af360_gold.gold_supporter_360"
+S = f"{CAT}.af360_gold.gold_supporter_scores"
 A = f"{CAT}.af360_gold.gold_supporter_activity"
 OUT = os.path.join(os.path.dirname(__file__), "..", "app", "server", "data")
 os.makedirs(OUT, exist_ok=True)
@@ -28,7 +29,17 @@ cols = ["supporter_id","first_name","age_band","country","city","membership_tier
         "days_since_last_activity","engagement_score","purchase_intent_score",
         "recommended_next_action","recommendation_reason"]
 
-_, data = d.run(f"SELECT {','.join(cols)} FROM {G}")
+# JOIN the SDP-owned Customer 360 with the ML intelligence overlay
+# (gold_supporter_scores), preferring the ML intent score / NBA / GenAI reason.
+sel = [f"g.{c}" for c in cols[:22]] + [
+    "CAST(COALESCE(s.purchase_intent_score, g.purchase_intent_score) AS INT) AS purchase_intent_score",
+    "COALESCE(s.recommended_next_action, g.recommended_next_action) AS recommended_next_action",
+    "COALESCE(s.genai_reason, g.recommendation_reason) AS recommendation_reason",
+]
+_, data = d.run(f"""
+  SELECT {','.join(sel)}
+  FROM {G} g LEFT JOIN {S} s USING (supporter_id)
+""")
 profiles = []
 for row in data:
     r = dict(zip(cols, row))

@@ -1,0 +1,56 @@
+==============================================================================
+ARSENAL FAN 360 :: EXECUTIVE / COMMERCIAL METRICS
+Computed from the Gold Customer 360 snapshot (synthetic data). Not hardcoded.
+==============================================================================
+
+BUSINESS PERSONAS (representative football-club executives, not real people)
+  Economic buyer   : Chief Commercial Officer
+  Operational owner: Head of Fan Engagement / CRM
+
+COMMERCIAL KPIs (OBSERVED FROM SYNTHETIC DATA)
+  Total supporters                 : 5,000
+  Total supporter value            : GBP 1,175,207
+  High-intent supporters (>=70)    : 333
+  High-intent supporter value      : GBP 76,152
+  Matches attended (all supporters): 3,919
+  Open commercial opportunities    : 2,748
+
+COMMERCIAL OPPORTUNITIES (count / value / avg intent / likely owner / KPI)
+  Experience               n=2252  GBP    487,328  avg_intent= 23
+      owner: Fan Engagement  | KPI: Experience uptake
+  Merchandise Opportunity  n=919   GBP    219,833  avg_intent= 28
+      owner: Retail / Ecommerce  | KPI: Merchandise revenue
+  Membership Opportunity   n=803   GBP    233,432  avg_intent= 21
+      owner: Head of Membership / Fan Engagement  | KPI: Membership conversion
+  Hospitality Opportunity  n=522   GBP    190,366  avg_intent= 23
+      owner: Commercial / Hospitality  | KPI: Hospitality utilisation / revenue
+  Re-engagement            n=311   GBP     27,585  avg_intent=  1
+      owner: CRM / Fan Engagement  | KPI: Reactivation rate
+  Ticket Intent            n=193   GBP     16,663  avg_intent= 35
+      owner: Ticketing / Fan Engagement  | KPI: Ticket conversion
+
+BUSINESS CASE — OBSERVED FROM SYNTHETIC DATA
+    high_intent_supporters                 333
+    actionable_opportunity_supporters      2,748
+    addressable_supporter_value_sample     687,879
+    membership_opportunity_value           233,432
+    hospitality_opportunity_value          190,366
+    reengagement_opportunity_value         27,585
+
+BUSINESS CASE — ILLUSTRATIVE COMMERCIAL SCENARIO (NOT actual Arsenal financials)
+  Assumptions (tunable):
+    baseline_conversion_pct          8.0
+    expected_uplift_pct              25.0
+    contribution_margin_pct          60.0
+    annual_platform_cost_gbp         120000
+    representative_supporter_base    250000
+  Illustrative results:
+    Scaled addressable value         GBP 34,393,928
+    Incremental converted value      GBP 687,879
+    Incremental gross contribution   GBP 412,727
+    Annual platform cost             GBP 120,000
+    ROI                              2.44x (244%)
+    Payback                          3.5 months
+
+  DISCLAIMER: Illustrative scenario — not actual Arsenal financial performance. Observed values are computed from synthetic supporter data (5,000-supporter sample); the scenario scales the observed addressable opportunity to a representative supporter base and applies the tunable assumptions above.
+==============================================================================

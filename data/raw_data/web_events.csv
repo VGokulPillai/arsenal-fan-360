@@ -19999,3 +19999,8 @@ S004131,2025-08-28 17:28:18,Store,Cart,P1094,,SESS101860,added_to_cart
 S003814,2025-08-25 01:30:01,Store,Cart,P1010,,SESS475532,added_to_cart
 S003435,2025-04-22 09:19:26,Store,2024/25 Away Shirt,P1000,,SESS550676,viewed_away_shirt
 S003770,2025-08-22 10:51:52,Fixtures,Upcoming Fixtures,,,SESS162267,viewed_fixtures
+,2025-09-10 10:00:00,Store,Cart,P1001,,SESS000001,added_to_cart
+,2025-09-11 11:00:00,Tickets,Buy,,M001,SESS000002,viewed_match_ticket
+S000001,,News,Latest,,,SESS000003,viewed_news
+S000002,not-a-timestamp,Store,Shirt,P1002,,SESS000004,viewed_home_shirt
+S000003,2025-09-12 09:30:00,Unknown,??,,,SESS000005,???invalid

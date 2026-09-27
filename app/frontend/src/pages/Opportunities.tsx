@@ -45,7 +45,18 @@ export default function Opportunities() {
             </div>
             <h3 className="font-display text-xl text-white mt-4 tracking-wide">{o.type}</h3>
             <p className="text-white/60 text-sm mt-1">{o.description}</p>
+            <div className="grid grid-cols-2 gap-2 mt-3">
+              <div className="rounded-md bg-white/[0.04] px-2 py-1">
+                <div className="text-white/40 text-[10px] uppercase tracking-wide">Cohort value</div>
+                <div className="text-white text-sm font-semibold">£{o.value.toLocaleString()}</div>
+              </div>
+              <div className="rounded-md bg-white/[0.04] px-2 py-1">
+                <div className="text-white/40 text-[10px] uppercase tracking-wide">Avg intent</div>
+                <div className="text-white text-sm font-semibold">{o.avg_intent}</div>
+              </div>
+            </div>
             <p className="text-arsenal-gold text-xs mt-3 uppercase tracking-wide">→ {o.action}</p>
+            <p className="text-white/40 text-[11px] mt-2">Owner: {o.owner} · KPI: {o.kpi}</p>
           </button>
         ))}
       </div>

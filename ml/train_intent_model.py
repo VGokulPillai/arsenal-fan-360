@@ -187,23 +187,23 @@ for _, r in top.head(6).iterrows():
     print(f"  [{r['recommended_next_action']}] {r['first_name']} ({r['purchase_intent_score']}/100): {r['recommendation_reason']}")
 
 # COMMAND ----------
-# MAGIC %md ## 6. Write scores back to Gold Customer 360
+# MAGIC %md ## 6. Publish scores to a dedicated gold_supporter_scores table
+# MAGIC The base Customer 360 (`gold_supporter_360`) is owned by the Lakeflow
+# MAGIC Spark Declarative Pipeline (materialized view), so we do **not** mutate it
+# MAGIC here. Instead the ML layer writes its own `gold_supporter_scores` table,
+# MAGIC which the operational layer (Lakebase sync / app snapshot) JOINs back to
+# MAGIC the 360 on `supporter_id`. This keeps a clean separation: SDP owns the
+# MAGIC curated 360, ML owns the intelligence overlay.
 
 # COMMAND ----------
 score_sdf = spark.createDataFrame(
     pdf[["supporter_id","purchase_intent_score","recommended_next_action","genai_reason","intent_prob"]]
-    .rename(columns={"intent_prob": "model_intent_prob"})
+    .rename(columns={"intent_prob": "model_intent_prob", "genai_reason": "recommendation_reason"})
 )
 score_sdf.createOrReplaceTempView("v_scores")
 spark.sql(f"CREATE OR REPLACE TABLE {CAT}.af360_gold.gold_supporter_scores AS SELECT * FROM v_scores")
-spark.sql(f"""
-  MERGE INTO {GOLD} t USING v_scores s ON t.supporter_id = s.supporter_id
-  WHEN MATCHED THEN UPDATE SET
-    t.purchase_intent_score = s.purchase_intent_score,
-    t.recommended_next_action = s.recommended_next_action,
-    t.recommendation_reason = COALESCE(s.genai_reason, t.recommendation_reason)
-""")
-print("Gold Customer 360 updated with model intent scores + GenAI reasons + NBA.")
+print("gold_supporter_scores written (intent score + NBA + GenAI reason). "
+      "gold_supporter_360 left intact — it is owned by the Lakeflow SDP.")
 
 # COMMAND ----------
 # MAGIC %md ## Emit text evidence to the Unity Catalog evidence Volume
